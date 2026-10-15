@@ -1,0 +1,266 @@
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #141519;
+  color: #e2e4ea;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #1c1d22;
+  border-bottom: 1px solid #2a2c35;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  height: 38px;
+  width: auto;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.app-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #9da3b4;
+  border: 1px solid #363946;
+}
+
+.btn-secondary:hover {
+  background-color: #262831;
+  color: #ffffff;
+  border-color: #484c5c;
+}
+
+.btn-primary {
+  background-color: #007acc;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 122, 204, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0090f0;
+  box-shadow: 0 4px 10px rgba(0, 122, 204, 0.45);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Workspace */
+.workspace {
+  flex: 1;
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+}
+
+/* Cards */
+.card {
+  background-color: #1a1b20;
+  border: 1px solid #2a2c35;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #212229;
+  border-bottom: 1px solid #2a2c35;
+  font-size: 0.82rem;
+}
+
+.card-title {
+  font-weight: 600;
+  color: #d8dae2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+.shortcut-hint {
+  color: #7b8194;
+  font-size: 0.78rem;
+}
+
+.shortcut-hint kbd {
+  background: #2b2d37;
+  border: 1px solid #3e4252;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: Consolas, monospace;
+  color: #abb2bf;
+}
+
+.status-badge {
+  color: #7b8194;
+  font-size: 0.78rem;
+}
+
+.status-running {
+  color: #e5c07b !important;
+  font-weight: 500;
+}
+
+.status-success {
+  color: #98c379 !important;
+}
+
+.status-error {
+  color: #e06c75 !important;
+}
+
+/* Textarea Editor */
+#editor {
+  width: 100%;
+  height: 520px;
+  min-height: 380px;
+  resize: vertical;
+  background-color: #131417;
+  color: #abb2bf;
+  border: none;
+  padding: 16px 18px;
+  font-family: Consolas, "Fira Code", Monaco, "Courier New", monospace;
+  font-size: 14.5px;
+  line-height: 1.6;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-x: auto;
+  overflow-y: auto;
+  outline: none;
+  caret-color: #528bff;
+}
+
+#editor::placeholder {
+  color: #4f5362;
+  font-style: italic;
+}
+
+/* Output Area */
+.output-area {
+  width: 100%;
+  height: 520px;
+  min-height: 380px;
+  background-color: #101114;
+  padding: 16px 18px;
+  font-family: Consolas, "Fira Code", Monaco, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.output-placeholder {
+  color: #525666;
+  font-style: italic;
+}
+
+#output {
+  color: #e6edf3;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+}
+
+#error {
+  color: #ff6b6b;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+}
+
+/* Custom Scrollbars */
+#editor::-webkit-scrollbar,
+.output-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+#editor::-webkit-scrollbar-track,
+.output-area::-webkit-scrollbar-track {
+  background: #141519;
+}
+
+#editor::-webkit-scrollbar-thumb,
+.output-area::-webkit-scrollbar-thumb {
+  background: #2d303b;
+  border-radius: 4px;
+}
+
+#editor::-webkit-scrollbar-thumb:hover,
+.output-area::-webkit-scrollbar-thumb:hover {
+  background: #3e4252;
+}

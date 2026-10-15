@@ -1,0 +1,535 @@
+/* ==========================================================================
+   PyChamp — DSA AI Tutor Styles
+   Shares the same color palette & design language as the Code Editor page.
+   ========================================================================== */
+
+/* ── Reset & Base ────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #141519;
+  color: #e2e4ea;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Navbar (identical to editor page) ───────────────────────────────────── */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #1c1d22;
+  border-bottom: 1px solid #2a2c35;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  height: 38px;
+  width: auto;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.app-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Shared Button Styles ────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+  user-select: none;
+  text-decoration: none;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn-secondary {
+  background-color: transparent;
+  color: #9da3b4;
+  border: 1px solid #363946;
+}
+
+.btn-secondary:hover {
+  background-color: #262831;
+  color: #ffffff;
+  border-color: #484c5c;
+}
+
+.btn-primary {
+  background-color: #007acc;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,122,204,0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0090f0;
+  box-shadow: 0 4px 10px rgba(0,122,204,0.45);
+}
+
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-lg { padding: 12px 28px; font-size: 1rem; }
+.btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+
+/* ── Screens ─────────────────────────────────────────────────────────────── */
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Input Screen ────────────────────────────────────────────────────────── */
+.input-screen {
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+.input-card {
+  background-color: #1a1b20;
+  border: 1px solid #2a2c35;
+  border-radius: 12px;
+  padding: 48px 40px;
+  max-width: 620px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.input-card-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.input-card-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.input-card-desc {
+  color: #8b90a0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.topic-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  border-radius: 6px;
+  border: 1px solid #363946;
+  background-color: #131417;
+  color: #e2e4ea;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.topic-input:focus {
+  border-color: #007acc;
+}
+
+.topic-input::placeholder {
+  color: #525666;
+}
+
+/* ── Loading Screen ──────────────────────────────────────────────────────── */
+.loading-screen {
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+.loading-card {
+  text-align: center;
+  max-width: 500px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #2a2c35;
+  border-top-color: #007acc;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.loading-desc {
+  color: #8b90a0;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+}
+
+.agent-status-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.agent-chip {
+  background-color: #1a1b20;
+  border: 1px solid #2a2c35;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
+  color: #d8dae2;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+/* ── Result Screen ───────────────────────────────────────────────────────── */
+.result-screen {
+  padding: 0;
+}
+
+/* Topic banner */
+.topic-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background-color: #1c1d22;
+  border-bottom: 1px solid #2a2c35;
+  font-size: 0.9rem;
+}
+
+.topic-label {
+  color: #7b8194;
+  font-weight: 500;
+}
+
+.topic-value {
+  color: #ffffff;
+  font-weight: 700;
+  flex: 1;
+}
+
+/* ── Tab Bar ─────────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  background-color: #1a1b20;
+  border-bottom: 1px solid #2a2c35;
+  padding: 0 24px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #7b8194;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+  position: relative;
+}
+
+.tab-btn:hover:not(:disabled) { color: #d8dae2; }
+
+.tab-btn.active {
+  color: #ffffff;
+  border-bottom-color: #007acc;
+}
+
+.tab-btn.locked {
+  color: #4a4e5d;
+  cursor: not-allowed;
+}
+
+.tab-btn .lock-icon {
+  font-size: 0.75rem;
+  margin-left: 2px;
+}
+
+.tab-icon { font-size: 1rem; }
+
+/* ── Tab Panels ──────────────────────────────────────────────────────────── */
+.tab-panels {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.tab-panel {
+  display: none;
+  padding: 32px 24px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ── Confirm bar ─────────────────────────────────────────────────────────── */
+.confirm-bar {
+  margin-top: 32px;
+  padding: 20px 24px;
+  background-color: #1a1b20;
+  border: 1px solid #2a2c35;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.confirm-text {
+  color: #8b90a0;
+  font-size: 0.9rem;
+}
+
+/* ── Markdown body styling ───────────────────────────────────────────────── */
+.markdown-body {
+  color: #d8dae2;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.markdown-body h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a2c35;
+}
+
+.markdown-body h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 22px 0 10px;
+}
+
+.markdown-body h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e2e4ea;
+  margin: 18px 0 8px;
+}
+
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #d0d2da;
+  margin: 14px 0 6px;
+}
+
+.markdown-body p {
+  margin: 10px 0;
+}
+
+.markdown-body ul, .markdown-body ol {
+  padding-left: 24px;
+  margin: 10px 0;
+}
+
+.markdown-body li {
+  margin: 4px 0;
+}
+
+.markdown-body strong {
+  color: #ffffff;
+}
+
+.markdown-body em {
+  color: #abb2bf;
+  font-style: italic;
+}
+
+.markdown-body a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body blockquote {
+  border-left: 3px solid #007acc;
+  padding: 8px 16px;
+  margin: 12px 0;
+  color: #9da3b4;
+  background-color: rgba(0,122,204,0.06);
+  border-radius: 0 6px 6px 0;
+}
+
+.markdown-body code {
+  background-color: #1e2028;
+  color: #e5c07b;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: Consolas, "Fira Code", Monaco, "Courier New", monospace;
+  font-size: 0.88em;
+}
+
+.markdown-body pre {
+  background-color: #131417;
+  border: 1px solid #2a2c35;
+  border-radius: 6px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 14px 0;
+}
+
+.markdown-body pre code {
+  background: none;
+  color: #abb2bf;
+  padding: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.88rem;
+}
+
+.markdown-body th {
+  text-align: left;
+  padding: 10px 14px;
+  background-color: #1e1f26;
+  border: 1px solid #2a2c35;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.markdown-body td {
+  padding: 10px 14px;
+  border: 1px solid #2a2c35;
+  color: #d0d2da;
+}
+
+.markdown-body tr:nth-child(even) td {
+  background-color: rgba(255,255,255,0.015);
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid #2a2c35;
+  margin: 24px 0;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+/* ── Error Toast ─────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #3b1a1a;
+  border: 1px solid #6b2d2d;
+  color: #f5a3a3;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #f5a3a3;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* ── Custom Scrollbar ────────────────────────────────────────────────────── */
+.tab-panels::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tab-panels::-webkit-scrollbar-track {
+  background: #141519;
+}
+
+.tab-panels::-webkit-scrollbar-thumb {
+  background: #2d303b;
+  border-radius: 4px;
+}
+
+.tab-panels::-webkit-scrollbar-thumb:hover {
+  background: #3e4252;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .input-card { padding: 32px 20px; }
+  .input-row { flex-direction: column; }
+  .tab-btn { padding: 12px 14px; font-size: 0.82rem; }
+  .confirm-bar { flex-direction: column; text-align: center; }
+  .topic-banner { flex-wrap: wrap; }
+}

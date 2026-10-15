@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyChamp - DSA AI Tutor</title>
+  <link rel="stylesheet" href="{% static 'editor/dsa.css' %}?v=1">
+  <!-- Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- ── Navbar ─────────────────────────────────────────────────────── -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
+      <h1 class="app-title">DSA AI Tutor</h1>
+    </div>
+    <div class="navbar-right">
+      <a href="/" class="btn btn-secondary">← Code Editor</a>
+    </div>
+  </header>
+
+  <!-- ── Topic Input Screen ─────────────────────────────────────────── -->
+  <section id="inputScreen" class="screen input-screen">
+    <div class="input-card">
+      <div class="input-card-icon">🧠</div>
+      <h2 class="input-card-heading">Learn any DSA topic with AI</h2>
+      <p class="input-card-desc">
+        Enter a Data Structures &amp; Algorithms topic below. Three AI agents will
+        generate a complete learning package — Theory, Pseudocode, and Python Code —
+        just for you.
+      </p>
+      <div class="input-row">
+        <input
+          id="topicInput"
+          type="text"
+          class="topic-input"
+          placeholder="e.g. Binary Search, Merge Sort, Two Sum Problem…"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button id="learnBtn" class="btn btn-primary btn-lg" type="button">
+          <span>✦</span> Learn
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Loading Screen ─────────────────────────────────────────────── -->
+  <section id="loadingScreen" class="screen loading-screen" style="display:none;">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h2 class="loading-heading">Generating your lesson…</h2>
+      <p class="loading-desc">Three AI agents are working in parallel on <strong id="loadingTopic"></strong></p>
+      <div class="agent-status-row">
+        <span class="agent-chip">📖 Theory</span>
+        <span class="agent-chip">📝 Pseudocode</span>
+        <span class="agent-chip">🐍 Code</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Result Screen ──────────────────────────────────────────────── -->
+  <section id="resultScreen" class="screen result-screen" style="display:none;">
+
+    <!-- Topic banner -->
+    <div class="topic-banner">
+      <span class="topic-label">Topic:</span>
+      <span id="resultTopic" class="topic-value"></span>
+      <button id="newTopicBtn" class="btn btn-secondary btn-sm">New Topic</button>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="theory" id="tabTheory">
+        <span class="tab-icon">📖</span>
+        <span class="tab-label">Theory</span>
+      </button>
+      <button class="tab-btn locked" data-tab="pseudocode" id="tabPseudo" disabled>
+        <span class="tab-icon">📝</span>
+        <span class="tab-label">Pseudocode</span>
+        <span class="lock-icon">🔒</span>
+      </button>
+      <button class="tab-btn locked" data-tab="code" id="tabCode" disabled>
+        <span class="tab-icon">🐍</span>
+        <span class="tab-label">Code</span>
+        <span class="lock-icon">🔒</span>
+      </button>
+    </div>
+
+    <!-- Tab content panels -->
+    <div class="tab-panels">
+      <!-- Theory panel -->
+      <div class="tab-panel active" id="panelTheory">
+        <div id="theoryContent" class="markdown-body"></div>
+        <div class="confirm-bar" id="confirmTheory">
+          <p class="confirm-text">Have you studied the theory above?</p>
+          <button class="btn btn-primary" id="confirmTheoryBtn" type="button">
+            ✓ I've studied this — Unlock Pseudocode
+          </button>
+        </div>
+      </div>
+
+      <!-- Pseudocode panel -->
+      <div class="tab-panel" id="panelPseudo">
+        <div id="pseudoContent" class="markdown-body"></div>
+        <div class="confirm-bar" id="confirmPseudo">
+          <p class="confirm-text">Have you studied the pseudocode above?</p>
+          <button class="btn btn-primary" id="confirmPseudoBtn" type="button">
+            ✓ I've studied this — Unlock Code
+          </button>
+        </div>
+      </div>
+
+      <!-- Code panel -->
+      <div class="tab-panel" id="panelCode">
+        <div id="codeContent" class="markdown-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Error Toast ────────────────────────────────────────────────── -->
+  <div id="errorToast" class="toast" style="display:none;">
+    <span id="errorMsg"></span>
+    <button class="toast-close" id="toastClose">&times;</button>
+  </div>
+
+  <script>
+    // ── DOM refs ────────────────────────────────────────────────────
+    const inputScreen   = document.getElementById("inputScreen");
+    const loadingScreen = document.getElementById("loadingScreen");
+    const resultScreen  = document.getElementById("resultScreen");
+    const topicInput    = document.getElementById("topicInput");
+    const learnBtn      = document.getElementById("learnBtn");
+    const loadingTopic  = document.getElementById("loadingTopic");
+    const resultTopic   = document.getElementById("resultTopic");
+    const newTopicBtn   = document.getElementById("newTopicBtn");
+    const errorToast    = document.getElementById("errorToast");
+    const errorMsg      = document.getElementById("errorMsg");
+    const toastClose    = document.getElementById("toastClose");
+
+    // Tab buttons & panels
+    const tabTheory = document.getElementById("tabTheory");
+    const tabPseudo = document.getElementById("tabPseudo");
+    const tabCode   = document.getElementById("tabCode");
+    const panelTheory = document.getElementById("panelTheory");
+    const panelPseudo = document.getElementById("panelPseudo");
+    const panelCode   = document.getElementById("panelCode");
+
+    // Content areas
+    const theoryContent = document.getElementById("theoryContent");
+    const pseudoContent = document.getElementById("pseudoContent");
+    const codeContent   = document.getElementById("codeContent");
+
+    // Confirm buttons
+    const confirmTheoryBtn = document.getElementById("confirmTheoryBtn");
+    const confirmPseudoBtn = document.getElementById("confirmPseudoBtn");
+    const confirmTheory    = document.getElementById("confirmTheory");
+    const confirmPseudo    = document.getElementById("confirmPseudo");
+
+    // ── Screen switching ───────────────────────────────────────────
+    function showScreen(screen) {
+      inputScreen.style.display   = "none";
+      loadingScreen.style.display = "none";
+      resultScreen.style.display  = "none";
+      screen.style.display = "";
+    }
+
+    // ── Tab switching ──────────────────────────────────────────────
+    function activateTab(tabBtn, panel) {
+      // Deactivate all
+      [tabTheory, tabPseudo, tabCode].forEach(b => b.classList.remove("active"));
+      [panelTheory, panelPseudo, panelCode].forEach(p => p.classList.remove("active"));
+      // Activate target
+      tabBtn.classList.add("active");
+      panel.classList.add("active");
+    }
+
+    tabTheory.addEventListener("click", () => activateTab(tabTheory, panelTheory));
+    tabPseudo.addEventListener("click", () => {
+      if (!tabPseudo.disabled) activateTab(tabPseudo, panelPseudo);
+    });
+    tabCode.addEventListener("click", () => {
+      if (!tabCode.disabled) activateTab(tabCode, panelCode);
+    });
+
+    // ── Unlock logic ───────────────────────────────────────────────
+    confirmTheoryBtn.addEventListener("click", () => {
+      // Unlock pseudocode tab
+      tabPseudo.disabled = false;
+      tabPseudo.classList.remove("locked");
+      tabPseudo.querySelector(".lock-icon").style.display = "none";
+      confirmTheory.style.display = "none";
+      // Auto-switch to pseudocode
+      activateTab(tabPseudo, panelPseudo);
+    });
+
+    confirmPseudoBtn.addEventListener("click", () => {
+      // Unlock code tab
+      tabCode.disabled = false;
+      tabCode.classList.remove("locked");
+      tabCode.querySelector(".lock-icon").style.display = "none";
+      confirmPseudo.style.display = "none";
+      // Auto-switch to code
+      activateTab(tabCode, panelCode);
+    });
+
+    // ── Error toast ────────────────────────────────────────────────
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorToast.style.display = "flex";
+      setTimeout(() => { errorToast.style.display = "none"; }, 8000);
+    }
+    toastClose.addEventListener("click", () => { errorToast.style.display = "none"; });
+
+    // ── Learn button — invoke the DSA agent ────────────────────────
+    function startLearning() {
+      const topic = topicInput.value.trim();
+      if (!topic) {
+        showError("Please enter a DSA topic.");
+        topicInput.focus();
+        return;
+      }
+
+      // Show loading
+      loadingTopic.textContent = topic;
+      showScreen(loadingScreen);
+
+      fetch("/dsa/invoke/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: topic }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showError(data.error);
+            showScreen(inputScreen);
+            return;
+          }
+
+          // Populate content
+          resultTopic.textContent = data.topic || topic;
+          theoryContent.innerHTML = marked.parse(data.theory || "");
+          pseudoContent.innerHTML = marked.parse(data.pseudocode || "");
+          codeContent.innerHTML   = marked.parse(data.code || "");
+
+          // Reset tab state
+          tabTheory.classList.add("active");
+          tabPseudo.disabled = true;
+          tabPseudo.classList.add("locked");
+          tabPseudo.querySelector(".lock-icon").style.display = "";
+          tabCode.disabled = true;
+          tabCode.classList.add("locked");
+          tabCode.querySelector(".lock-icon").style.display = "";
+          confirmTheory.style.display = "";
+          confirmPseudo.style.display = "";
+
+          activateTab(tabTheory, panelTheory);
+          showScreen(resultScreen);
+        })
+        .catch(err => {
+          showError("Network error: " + err.message);
+          showScreen(inputScreen);
+        });
+    }
+
+    learnBtn.addEventListener("click", startLearning);
+    topicInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") startLearning();
+    });
+
+    // ── New topic button ───────────────────────────────────────────
+    newTopicBtn.addEventListener("click", () => {
+      topicInput.value = "";
+      showScreen(inputScreen);
+      topicInput.focus();
+    });
+  </script>
+</body>
+</html>
