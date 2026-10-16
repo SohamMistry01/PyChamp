@@ -21,6 +21,7 @@
     
     <div class="navbar-right">
       {% if request.user.is_authenticated %}
+        <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved Notes">📚 Saved Notes</a>
         <a href="{% url 'profile' %}" class="user-chip" title="View &amp; Edit Profile">
           <span class="user-chip-icon">👤</span>
           <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
@@ -139,28 +140,35 @@
         </div>
       </a>
 
-      <!-- Card 4: Upcoming / Dummy Module -->
-      <div class="module-card card-dummy" title="Coming Soon">
+      <!-- Card 4: Saved DSA Notes -->
+      <a href="{% url 'saved_notes' %}" class="module-card card-notes" title="Open Saved DSA Notes Library">
         <div class="card-header-row">
-          <div class="card-icon-box">🏆</div>
-          <span class="card-badge">Coming Soon</span>
+          <div class="card-icon-box">📚</div>
+          <span class="card-badge">
+            {% if saved_notes_count %}
+              {{ saved_notes_count }} Topic{{ saved_notes_count|pluralize }} Saved
+            {% else %}
+              Study Library
+            {% endif %}
+          </span>
         </div>
         <div class="card-body">
-          <h3 class="card-title">Challenges &amp; Quizzes</h3>
+          <h3 class="card-title">Saved DSA Notes</h3>
           <p class="card-description">
-            Interactive LeetCode-style coding challenges, automated unit test suites, timed quizzes, and skill badges to accelerate your algorithm mastery.
+            Access and revisit all your AI-generated theory notes, pseudocode algorithms, and Python solutions stored directly in your local machine folder—with zero token cost.
           </p>
           <div class="card-tags">
-            <span class="card-tag">Unit Tests</span>
-            <span class="card-tag">Timed Contests</span>
-            <span class="card-tag">Leaderboards</span>
+            <span class="card-tag">Theory Notes</span>
+            <span class="card-tag">Pseudocode</span>
+            <span class="card-tag">Python Solutions</span>
+            <span class="card-tag">Zero Tokens</span>
           </div>
         </div>
         <div class="card-action-btn">
-          <span>In Development</span>
-          <span>⏳</span>
+          <span>Browse Library</span>
+          <span>→</span>
         </div>
-      </div>
+      </a>
 
     </section>
 

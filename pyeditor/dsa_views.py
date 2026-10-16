@@ -129,3 +129,59 @@ def dsa_invoke(request):
             "traceback": tb,
             "detail": f"{error_type}: {error_msg}",
         }, status=500)
+
+
+@csrf_exempt
+def dsa_save_notes(request):
+    """
+    POST endpoint to save generated DSA markdown content (theory, pseudocode, code)
+    into a dedicated subfolder on the user's local machine disk and register it in UserProfile.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Authentication required. Please sign in."}, status=401)
+
+    if request.method != "POST":
+        return JsonResponse({"error": "POST method required"}, status=405)
+
+    try:
+        if request.content_type and "json" in request.content_type:
+            raw_body = request.body.decode("utf-8") if isinstance(request.body, bytes) else request.body
+            data = json.loads(raw_body)
+        else:
+            data = request.POST
+
+        topic = data.get("topic", "").strip()
+        theory = data.get("theory", "")
+        pseudocode = data.get("pseudocode", "")
+        code = data.get("code", "")
+
+        if not topic:
+            return JsonResponse({"error": "Topic title is required to save notes."}, status=400)
+
+        from pyeditor.models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        note_entry = profile.save_topic_notes(
+            topic=topic,
+            theory=theory,
+            pseudocode=pseudocode,
+            code=code,
+        )
+
+        logger.info(
+            "[DSA SAVE] Saved notes for user '%s' on topic '%s' in folder '%s'",
+            request.user.username,
+            topic,
+            note_entry.get("folder_name"),
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Successfully saved '{topic}' notes to local machine directory!",
+            "note": note_entry,
+            "total_saved": len(profile.saved_notes),
+        })
+
+    except Exception as e:
+        logger.error("[DSA SAVE ERROR] %s", traceback.format_exc())
+        return JsonResponse({"error": str(e)}, status=500)
+

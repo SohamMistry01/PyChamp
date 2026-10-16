@@ -286,6 +286,7 @@
     </div>
     <div class="navbar-right">
       <a href="{% url 'home' %}" class="btn btn-secondary" title="PyChamp Home">🏠 Home</a>
+      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="Saved DSA Notes">📚 Saved Notes</a>
       <a href="{% url 'dsa' %}" class="btn btn-secondary" title="DSA AI Tutor">🧠 DSA Tutor</a>
       <button id="clearBtn" class="btn btn-secondary" type="button" title="Clear code in editor">Clear</button>
       <button id="runBtn" class="btn btn-primary" type="button" title="Execute script (Ctrl + Enter)">
@@ -409,6 +410,18 @@
         editor.focus();
       }
     });
+
+    // Check for preloaded code transferred from Saved Notes
+    const preloadedCode = localStorage.getItem("pychamp_preload_code");
+    if (preloadedCode) {
+      editor.value = preloadedCode;
+      localStorage.removeItem("pychamp_preload_code");
+      const topicName = localStorage.getItem("pychamp_preload_topic") || "";
+      if (topicName) {
+        statusBadge.textContent = `Loaded: ${topicName}`;
+        localStorage.removeItem("pychamp_preload_topic");
+      }
+    }
   </script>
 </body>
 </html>

@@ -409,51 +409,28 @@ body {
   box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
 }
 
-/* ── Card 4: Dummy / Coming Soon (Amber / Neutral) ────────────────────────── */
-.card-dummy {
-  opacity: 0.85;
-  cursor: default;
-}
-.card-dummy::before {
+/* ── Card 4: Saved Notes Theme (Amber / Gold) ────────────────────────────── */
+.card-notes::before {
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
-.card-dummy:hover {
-  transform: none;
-  border-color: #2a2c35;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-}
-.card-dummy .card-icon-box {
+.card-notes .card-icon-box {
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #fbbf24;
 }
-.card-dummy .card-badge {
+.card-notes .card-badge {
   background: rgba(245, 158, 11, 0.16);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #fde68a;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
 }
-.card-dummy .card-badge::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #fbbf24;
-  box-shadow: 0 0 6px #fbbf24;
-  animation: pulseDot 2s infinite ease-in-out;
+.card-notes .card-action-btn {
+  background-color: #d97706;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
 }
-@keyframes pulseDot {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-.card-dummy .card-action-btn {
-  background-color: #242630;
-  border: 1px solid #363946;
-  color: #9da3b4;
-  cursor: not-allowed;
+.card-notes:hover .card-action-btn {
+  background-color: #f59e0b;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */

@@ -1,0 +1,489 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saved DSA Notes — PyChamp</title>
+  <link rel="stylesheet" href="{% static 'editor/saved_notes.css' %}?v=1">
+  <!-- Marked.js for real-time Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- ── Top Navbar ──────────────────────────────────────────────────────── -->
+  <header class="navbar">
+    <a href="{% url 'home' %}" class="navbar-brand-link" title="PyChamp Home">
+      <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
+      <div class="app-title-group">
+        <h1 class="app-title">PyChamp</h1>
+        <span class="section-badge">📚 Saved Notes</span>
+      </div>
+    </a>
+
+    <div class="navbar-right">
+      <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
+      <a href="{% url 'dsa' %}" class="btn btn-secondary">🧠 DSA AI Tutor</a>
+      <a href="{% url 'editor' %}" class="btn btn-secondary">💻 Code Editor</a>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="user-chip" title="View &amp; Edit Profile">
+          <span class="user-chip-icon">👤</span>
+          <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- ── Main Workspace ─────────────────────────────────────────────────── -->
+  <main class="notes-workspace">
+
+    <!-- ── Left Sidebar (Saved Topics & Dropdowns) ──────────────────────── -->
+    <aside class="notes-sidebar">
+      
+      <!-- Sidebar Header -->
+      <div class="sidebar-header">
+        <div class="sidebar-title-group">
+          <span class="sidebar-title">Saved Topics</span>
+          <span class="count-pill" id="topicsCount">{{ total_saved }}</span>
+        </div>
+        <a href="{% url 'dsa' %}" class="btn btn-primary btn-sm" title="Generate notes for a new topic">
+          <span>✦</span> New
+        </a>
+      </div>
+
+      <!-- Search Box -->
+      <div class="sidebar-search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchTopics"
+          class="search-input"
+          placeholder="Filter saved topics…"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+
+      <!-- Topics Accordion List -->
+      <div class="topics-list" id="topicsList">
+        {% if saved_notes %}
+          {% for note in saved_notes %}
+            <div
+              class="topic-item {% if active_folder == note.folder_name %}active-topic expanded{% endif %}"
+              data-folder="{{ note.folder_name }}"
+              data-topic="{{ note.topic }}"
+            >
+              <!-- Topic Header / Accordion Trigger -->
+              <div class="topic-header" title="Click to expand/collapse files">
+                <div class="topic-header-left">
+                  <span class="topic-folder-icon">📁</span>
+                  <div class="topic-title-wrap">
+                    <span class="topic-title">{{ note.topic }}</span>
+                    <span class="topic-date">{{ note.saved_at }}</span>
+                  </div>
+                </div>
+                <div class="topic-header-right">
+                  <button
+                    class="btn-delete-topic"
+                    type="button"
+                    title="Delete notes for this topic"
+                    data-folder="{{ note.folder_name }}"
+                    data-topic="{{ note.topic }}"
+                  >
+                    🗑️
+                  </button>
+                  <span class="chevron-icon">▾</span>
+                </div>
+              </div>
+
+              <!-- Dropdown with the 3 Markdown Files -->
+              <div class="topic-files-dropdown">
+                <button
+                  type="button"
+                  class="file-item-btn {% if active_folder == note.folder_name and active_type == 'theory' %}active{% endif %}"
+                  data-folder="{{ note.folder_name }}"
+                  data-topic="{{ note.topic }}"
+                  data-type="theory"
+                  data-filename="theory.md"
+                >
+                  <div class="file-item-left">
+                    <span>📖</span>
+                    <span>Theory</span>
+                  </div>
+                  <span class="file-badge-pill">theory.md</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="file-item-btn {% if active_folder == note.folder_name and active_type == 'pseudocode' %}active{% endif %}"
+                  data-folder="{{ note.folder_name }}"
+                  data-topic="{{ note.topic }}"
+                  data-type="pseudocode"
+                  data-filename="pseudocode.md"
+                >
+                  <div class="file-item-left">
+                    <span>📝</span>
+                    <span>Pseudocode</span>
+                  </div>
+                  <span class="file-badge-pill">pseudocode.md</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="file-item-btn {% if active_folder == note.folder_name and active_type == 'code' %}active{% endif %}"
+                  data-folder="{{ note.folder_name }}"
+                  data-topic="{{ note.topic }}"
+                  data-type="code"
+                  data-filename="code.md"
+                >
+                  <div class="file-item-left">
+                    <span>🐍</span>
+                    <span>Python Code</span>
+                  </div>
+                  <span class="file-badge-pill">code.md</span>
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state" id="sidebarEmptyState" style="padding: 24px 16px;">
+            <p style="color: #6a7082; font-size: 0.88rem; text-align: center;">No topics saved yet.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <a href="{% url 'dsa' %}" class="btn btn-new-topic">
+          <span>🧠</span> Generate New Topic
+        </a>
+        <div class="dir-hint" title="Files stored on your computer at: saved_notes/{{ request.user.username }}/">
+          📁 Local storage: saved_notes/{{ request.user.username }}
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Right Reading Canvas ─────────────────────────────────────────── -->
+    <section class="notes-canvas" id="notesCanvas">
+      {% if active_note %}
+        <!-- Canvas Header -->
+        <header class="canvas-header" id="canvasHeader">
+          <div class="canvas-header-left">
+            <h2 class="canvas-topic-title" id="canvasTopicTitle">{{ active_note.topic }}</h2>
+            <span
+              id="canvasFileBadge"
+              class="active-file-pill {% if active_type == 'theory' %}pill-theory{% elif active_type == 'pseudocode' %}pill-pseudocode{% else %}pill-code{% endif %}"
+            >
+              {% if active_type == 'theory' %}
+                📖 theory.md
+              {% elif active_type == 'pseudocode' %}
+                📝 pseudocode.md
+              {% else %}
+                🐍 code.md
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="canvas-actions">
+            <!-- Open in Code Editor button (visible when code is viewed) -->
+            <button
+              id="openInEditorBtn"
+              class="btn btn-editor-open btn-sm"
+              type="button"
+              style="{% if active_type != 'code' %}display: none;{% endif %}"
+              title="Send this Python solution to the Code Editor workspace"
+            >
+              <span>▶</span> Test in Code Editor
+            </button>
+
+            <!-- Copy Markdown button -->
+            <button id="copyContentBtn" class="btn btn-secondary btn-sm" type="button" title="Copy raw markdown to clipboard">
+              <span id="copyBtnIcon">📋</span>
+              <span id="copyBtnText">Copy Markdown</span>
+            </button>
+
+            <!-- Learn in DSA Tutor button -->
+            <a
+              id="revisitDsaBtn"
+              href="{% url 'dsa' %}"
+              class="btn btn-secondary btn-sm"
+              title="Launch topic in AI DSA Tutor"
+            >
+              <span>🧠</span> AI Tutor
+            </a>
+          </div>
+        </header>
+
+        <!-- Markdown Document Body -->
+        <div class="canvas-body" id="canvasBody">
+          <article class="markdown-body" id="markdownViewer"></article>
+        </div>
+
+      {% else %}
+        <!-- Zero State Canvas -->
+        <div class="empty-state">
+          <div class="empty-state-icon">📚</div>
+          <h2 class="empty-state-title">Your Study Library is Empty</h2>
+          <p class="empty-state-desc">
+            You haven't saved any topics yet. Open the AI DSA Tutor, generate Theory,
+            Pseudocode, and Python Code for any topic, and click <strong>"Save Topic Notes"</strong>
+            after unlocking the Code tab to build your offline library!
+          </p>
+          <a href="{% url 'dsa' %}" class="btn btn-primary" style="padding: 12px 24px; font-size: 0.95rem;">
+            <span>🧠</span> Launch AI DSA Tutor Now
+          </a>
+        </div>
+      {% endif %}
+    </section>
+
+  </main>
+
+  <!-- ── Embedded Initial Content ───────────────────────────────────────── -->
+  {{ active_content|json_script:"initial-markdown-content" }}
+
+  <script>
+    // ── State & DOM references ───────────────────────────────────────────
+    let currentFolder = "{{ active_folder|escapejs }}";
+    let currentType   = "{{ active_type|escapejs }}";
+    let currentTopic  = "{{ active_note.topic|default:''|escapejs }}";
+    let currentRawMarkdown = "";
+
+    const markdownViewer  = document.getElementById("markdownViewer");
+    const canvasTopicTitle = document.getElementById("canvasTopicTitle");
+    const canvasFileBadge  = document.getElementById("canvasFileBadge");
+    const openInEditorBtn  = document.getElementById("openInEditorBtn");
+    const copyContentBtn   = document.getElementById("copyContentBtn");
+    const copyBtnIcon      = document.getElementById("copyBtnIcon");
+    const copyBtnText      = document.getElementById("copyBtnText");
+    const searchTopics     = document.getElementById("searchTopics");
+    const topicsList       = document.getElementById("topicsList");
+    const topicsCount      = document.getElementById("topicsCount");
+
+    // Load initial content from script tag
+    const initialContentScript = document.getElementById("initial-markdown-content");
+    if (initialContentScript && markdownViewer) {
+      try {
+        currentRawMarkdown = JSON.parse(initialContentScript.textContent) || "";
+        markdownViewer.innerHTML = marked.parse(currentRawMarkdown);
+      } catch (e) {
+        console.error("Failed to parse initial markdown:", e);
+      }
+    }
+
+    // ── Helper: Update File Badge Pill ──────────────────────────────────
+    function updateFileBadge(type, filename) {
+      if (!canvasFileBadge) return;
+      canvasFileBadge.className = "active-file-pill";
+      if (type === "theory") {
+        canvasFileBadge.classList.add("pill-theory");
+        canvasFileBadge.textContent = `📖 ${filename || "theory.md"}`;
+      } else if (type === "pseudocode") {
+        canvasFileBadge.classList.add("pill-pseudocode");
+        canvasFileBadge.textContent = `📝 ${filename || "pseudocode.md"}`;
+      } else {
+        canvasFileBadge.classList.add("pill-code");
+        canvasFileBadge.textContent = `🐍 ${filename || "code.md"}`;
+      }
+    }
+
+    // ── Accordion toggle: Expand/Collapse Topic Dropdown ─────────────────
+    document.querySelectorAll(".topic-header").forEach(header => {
+      header.addEventListener("click", (e) => {
+        // Prevent toggle if clicking delete button
+        if (e.target.closest(".btn-delete-topic")) return;
+
+        const topicItem = header.closest(".topic-item");
+        if (topicItem) {
+          topicItem.classList.toggle("expanded");
+        }
+      });
+    });
+
+    // ── File Selection: Load Markdown on click ───────────────────────────
+    async function selectFile(folder, type, topicName, clickedBtn) {
+      currentFolder = folder;
+      currentType = type;
+      currentTopic = topicName;
+
+      // Update active styling in sidebar
+      document.querySelectorAll(".file-item-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".topic-item").forEach(item => {
+        if (item.dataset.folder === folder) {
+          item.classList.add("active-topic");
+          item.classList.add("expanded");
+        } else {
+          item.classList.remove("active-topic");
+        }
+      });
+      if (clickedBtn) clickedBtn.classList.add("active");
+
+      // Update header
+      if (canvasTopicTitle) canvasTopicTitle.textContent = topicName;
+      updateFileBadge(type, `${type}.md`);
+
+      // Show/hide "Open in Code Editor" button
+      if (openInEditorBtn) {
+        openInEditorBtn.style.display = type === "code" ? "inline-flex" : "none";
+      }
+
+      // Show loading indicator in markdown viewer
+      if (markdownViewer) {
+        markdownViewer.style.opacity = "0.4";
+      }
+
+      try {
+        const response = await fetch(`/notes/content/?folder=${encodeURIComponent(folder)}&type=${encodeURIComponent(type)}`);
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          currentRawMarkdown = data.content || "";
+          if (markdownViewer) {
+            markdownViewer.innerHTML = marked.parse(currentRawMarkdown);
+          }
+        } else {
+          if (markdownViewer) {
+            markdownViewer.innerHTML = `<p style="color:#ff6b6b;">⚠️ Error loading file: ${data.error || "File not found"}</p>`;
+          }
+        }
+      } catch (err) {
+        console.error("Network error fetching note content:", err);
+        if (markdownViewer) {
+          markdownViewer.innerHTML = `<p style="color:#ff6b6b;">⚠️ Network error loading notes.</p>`;
+        }
+      } finally {
+        if (markdownViewer) {
+          markdownViewer.style.opacity = "1";
+        }
+      }
+
+      // Update URL parameters without reloading
+      const url = new URL(window.location);
+      url.searchParams.set("topic", folder);
+      url.searchParams.set("type", type);
+      window.history.replaceState({}, "", url);
+    }
+
+    // Attach click listeners to all file item buttons
+    document.querySelectorAll(".file-item-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const folder = btn.dataset.folder;
+        const type = btn.dataset.type;
+        const topic = btn.dataset.topic;
+        selectFile(folder, type, topic, btn);
+      });
+    });
+
+    // ── Search & Filter Topics ───────────────────────────────────────────
+    if (searchTopics) {
+      searchTopics.addEventListener("input", () => {
+        const query = searchTopics.value.trim().toLowerCase();
+        const items = document.querySelectorAll(".topic-item");
+        let visibleCount = 0;
+
+        items.forEach(item => {
+          const topicName = (item.dataset.topic || "").toLowerCase();
+          const folderName = (item.dataset.folder || "").toLowerCase();
+          const matches = topicName.includes(query) || folderName.includes(query);
+          item.style.display = matches ? "" : "none";
+          if (matches) visibleCount++;
+        });
+
+        if (topicsCount) topicsCount.textContent = visibleCount;
+      });
+    }
+
+    // ── Delete Topic Notes ───────────────────────────────────────────────
+    document.querySelectorAll(".btn-delete-topic").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const folder = btn.dataset.folder;
+        const topic = btn.dataset.topic;
+
+        const confirmDelete = confirm(`Are you sure you want to delete your saved notes for "${topic}"?\nThis will remove the topic folder from your local disk.`);
+        if (!confirmDelete) return;
+
+        try {
+          const response = await fetch("/notes/delete/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ folder_name: folder }),
+          });
+
+          const data = await response.json();
+          if (response.ok && data.success) {
+            const topicItem = btn.closest(".topic-item");
+            if (topicItem) topicItem.remove();
+
+            // Update count
+            const remaining = document.querySelectorAll(".topic-item").length;
+            if (topicsCount) topicsCount.textContent = remaining;
+
+            // If deleted topic was the active one, refresh or switch
+            if (currentFolder === folder) {
+              const nextItem = document.querySelector(".topic-item");
+              if (nextItem) {
+                const nextBtn = nextItem.querySelector(".file-item-btn");
+                if (nextBtn) {
+                  selectFile(nextItem.dataset.folder, "theory", nextItem.dataset.topic, nextBtn);
+                }
+              } else {
+                window.location.reload();
+              }
+            }
+          } else {
+            alert(`Delete failed: ${data.error || "Unknown error"}`);
+          }
+        } catch (err) {
+          alert("Network error while trying to delete notes.");
+        }
+      });
+    });
+
+    // ── Copy Markdown Content to Clipboard ──────────────────────────────
+    if (copyContentBtn) {
+      copyContentBtn.addEventListener("click", () => {
+        if (!currentRawMarkdown) return;
+        navigator.clipboard.writeText(currentRawMarkdown).then(() => {
+          copyBtnIcon.textContent = "✓";
+          copyBtnText.textContent = "Copied!";
+          setTimeout(() => {
+            copyBtnIcon.textContent = "📋";
+            copyBtnText.textContent = "Copy Markdown";
+          }, 2000);
+        }).catch(err => {
+          console.warn("Clipboard copy failed:", err);
+        });
+      });
+    }
+
+    // ── Open in Code Editor ──────────────────────────────────────────────
+    if (openInEditorBtn) {
+      openInEditorBtn.addEventListener("click", () => {
+        if (!currentRawMarkdown) return;
+
+        // Extract pure python code block if wrapped in markdown ```python ... ```
+        let pythonCode = currentRawMarkdown;
+        const codeBlockMatch = currentRawMarkdown.match(/```python\s*([\s\S]*?)```/);
+        if (codeBlockMatch && codeBlockMatch[1]) {
+          pythonCode = codeBlockMatch[1].trim();
+        } else {
+          const genericBlockMatch = currentRawMarkdown.match(/```[\w]*\s*([\s\S]*?)```/);
+          if (genericBlockMatch && genericBlockMatch[1]) {
+            pythonCode = genericBlockMatch[1].trim();
+          }
+        }
+
+        // Store in localStorage for the editor to pick up
+        localStorage.setItem("pychamp_preload_code", pythonCode);
+        localStorage.setItem("pychamp_preload_topic", currentTopic);
+
+        // Navigate to Code Editor
+        window.location.href = "{% url 'editor' %}";
+      });
+    }
+  </script>
+</body>
+</html>

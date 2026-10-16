@@ -35,10 +35,15 @@ class CustomUserAdmin(BaseUserAdmin):
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     """Standalone admin panel for UserProfile model."""
-    list_display = ("user", "experience_level", "created_at", "updated_at")
+    list_display = ("user", "experience_level", "get_saved_notes_count", "created_at", "updated_at")
     list_filter = ("experience_level", "created_at")
     search_fields = ("user__username", "user__email", "bio")
     readonly_fields = ("created_at", "updated_at")
+
+    @admin.display(description="Saved Notes")
+    def get_saved_notes_count(self, instance):
+        notes = instance.saved_notes or []
+        return f"{len(notes)} topics"
 
 # Re-register UserAdmin with profile inline
 admin.site.unregister(User)

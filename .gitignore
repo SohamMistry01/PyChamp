@@ -50,6 +50,8 @@ wheels/
 local_settings.py
 media/
 staticfiles/
+saved_notes/
+
 
 # Database
 db.sqlite3

@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import subprocess
@@ -12,6 +13,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import UserProfile
+
 
 
 # ── Authentication Views ───────────────────────────────────────────────────
@@ -202,7 +204,139 @@ def home_view(request):
     Render the PyChamp Home Dashboard featuring the 2x2 modular cards layout.
     """
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, "home.html", {"profile": profile})
+    saved_notes_count = len(profile.saved_notes or [])
+    return render(
+        request,
+        "home.html",
+        {
+            "profile": profile,
+            "saved_notes_count": saved_notes_count,
+        },
+    )
+
+
+@login_required(login_url="login")
+def saved_notes_view(request):
+    """
+    Render the Saved Notes library screen displaying all locally stored topics
+    on the user's machine, with sidebar file navigation and instant markdown preview.
+    """
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    user_dir = profile.get_notes_directory()
+    raw_notes = list(profile.saved_notes or [])
+    verified_notes = []
+
+    for item in raw_notes:
+        folder_name = item.get("folder_name", "")
+        topic_dir = user_dir / folder_name
+        if topic_dir.exists() and topic_dir.is_dir():
+            item_copy = dict(item)
+            item_copy["has_theory"] = (topic_dir / "theory.md").exists()
+            item_copy["has_pseudocode"] = (topic_dir / "pseudocode.md").exists()
+            item_copy["has_code"] = (topic_dir / "code.md").exists()
+            verified_notes.append(item_copy)
+
+    requested_folder = request.GET.get("topic", "").strip()
+    requested_file = request.GET.get("type", "theory").strip().lower()
+    if requested_file not in ["theory", "pseudocode", "code"]:
+        requested_file = "theory"
+
+    # Select active topic
+    active_note = None
+    if requested_folder:
+        for note in verified_notes:
+            if note.get("folder_name") == requested_folder:
+                active_note = note
+                break
+
+    if not active_note and verified_notes:
+        active_note = verified_notes[0]
+
+    # Load initial markdown content for active note
+    active_content = ""
+    if active_note:
+        active_content = profile.get_topic_markdown(
+            active_note.get("folder_name"),
+            requested_file
+        )
+
+    context = {
+        "profile": profile,
+        "saved_notes": verified_notes,
+        "total_saved": len(verified_notes),
+        "active_note": active_note,
+        "active_folder": active_note.get("folder_name") if active_note else "",
+        "active_type": requested_file,
+        "active_content": active_content,
+    }
+    return render(request, "saved_notes.html", context)
+
+
+@login_required(login_url="login")
+def saved_note_content(request):
+    """
+    Fetch the raw markdown string of a specific file ('theory', 'pseudocode', 'code')
+    for a specific topic folder stored on the user's local disk.
+    """
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    folder_name = request.GET.get("folder", "").strip()
+    file_type = request.GET.get("type", "theory").strip().lower()
+
+    if not folder_name:
+        return JsonResponse({"error": "Folder name is required."}, status=400)
+
+    if file_type not in ["theory", "pseudocode", "code"]:
+        return JsonResponse({"error": "Invalid file type. Must be theory, pseudocode, or code."}, status=400)
+
+    content = profile.get_topic_markdown(folder_name, file_type)
+
+    topic_title = folder_name
+    for note in (profile.saved_notes or []):
+        if note.get("folder_name") == folder_name:
+            topic_title = note.get("topic", folder_name)
+            break
+
+    return JsonResponse({
+        "success": True,
+        "folder_name": folder_name,
+        "topic": topic_title,
+        "file_type": file_type,
+        "content": content,
+        "filename": f"{file_type}.md",
+    })
+
+
+@csrf_exempt
+@login_required(login_url="login")
+def delete_saved_note(request):
+    """
+    Remove a topic's markdown files and directory from local storage and update UserProfile.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        if request.content_type and "json" in request.content_type:
+            data = json.loads(request.body.decode("utf-8") if isinstance(request.body, bytes) else request.body)
+        else:
+            data = request.POST
+
+        folder_name = data.get("folder_name", "").strip()
+        if not folder_name:
+            return JsonResponse({"error": "Folder name required."}, status=400)
+
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        profile.delete_topic_notes(folder_name)
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Successfully deleted '{folder_name}' notes.",
+            "folder_name": folder_name,
+            "total_saved": len(profile.saved_notes),
+        })
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 
 
 @login_required(login_url="login")

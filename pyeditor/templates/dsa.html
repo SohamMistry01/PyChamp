@@ -139,6 +139,7 @@
     </div>
     <div class="navbar-right">
       <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
+      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved DSA Notes">📚 Saved Notes</a>
       <a href="{% url 'editor' %}" class="btn btn-secondary">💻 Code Editor</a>
       {% if request.user.is_authenticated %}
         <a href="{% url 'profile' %}" class="user-chip" title="View & Edit Profile">
@@ -195,9 +196,16 @@
 
     <!-- Topic banner -->
     <div class="topic-banner">
-      <span class="topic-label">Topic:</span>
-      <span id="resultTopic" class="topic-value"></span>
-      <button id="newTopicBtn" class="btn btn-secondary btn-sm">New Topic</button>
+      <div class="topic-banner-info">
+        <span class="topic-label">Topic:</span>
+        <span id="resultTopic" class="topic-value"></span>
+      </div>
+      <div class="topic-banner-actions">
+        <button id="bannerSaveBtn" class="btn btn-save btn-sm" type="button" style="display:none;" title="Save all 3 notes to personal library">
+          <span>💾</span> Save Notes
+        </button>
+        <button id="newTopicBtn" class="btn btn-secondary btn-sm">New Topic</button>
+      </div>
     </div>
 
     <!-- Tab bar -->
@@ -245,6 +253,25 @@
       <!-- Code panel -->
       <div class="tab-panel" id="panelCode">
         <div id="codeContent" class="markdown-body"></div>
+        <!-- Save Notes Bar (Appears after Code tab is unlocked) -->
+        <div class="save-bar" id="saveBar" style="display:none;">
+          <div class="save-bar-info">
+            <span class="save-bar-icon">💾</span>
+            <div class="save-bar-text">
+              <h4 class="save-bar-title">All 3 Learning Modules Unlocked!</h4>
+              <p class="save-bar-desc">Save Theory, Pseudocode, and Code directly to your machine's study library folder for offline review with zero token cost.</p>
+            </div>
+          </div>
+          <div class="save-bar-actions">
+            <button class="btn btn-save" id="saveNotesBtn" type="button">
+              <span class="save-btn-icon">💾</span>
+              <span class="save-btn-text">Save Topic Notes</span>
+            </button>
+            <a href="{% url 'saved_notes' %}" class="btn btn-view-notes" id="viewNotesLink" style="display:none;">
+              <span>📚 Open in Saved Notes →</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -281,6 +308,13 @@
     const loadingTopic  = document.getElementById("loadingTopic");
     const resultTopic   = document.getElementById("resultTopic");
     const newTopicBtn   = document.getElementById("newTopicBtn");
+
+    // Save Notes UI refs
+    const saveBar       = document.getElementById("saveBar");
+    const saveNotesBtn  = document.getElementById("saveNotesBtn");
+    const bannerSaveBtn = document.getElementById("bannerSaveBtn");
+    const viewNotesLink = document.getElementById("viewNotesLink");
+    let currentLearningData = { topic: "", theory: "", pseudocode: "", code: "" };
 
     // Error UI refs
     const errorToast            = document.getElementById("errorToast");
@@ -335,7 +369,10 @@
       if (!tabPseudo.disabled) activateTab(tabPseudo, panelPseudo);
     });
     tabCode.addEventListener("click", () => {
-      if (!tabCode.disabled) activateTab(tabCode, panelCode);
+      if (!tabCode.disabled) {
+        activateTab(tabCode, panelCode);
+        if (saveBar) saveBar.style.display = "flex";
+      }
     });
 
     // ── Unlock logic ───────────────────────────────────────────────
@@ -357,6 +394,10 @@
       confirmPseudo.style.display = "none";
       // Auto-switch to code
       activateTab(tabCode, panelCode);
+
+      // Reveal Save Notes bar after Code tab is unlocked
+      if (saveBar) saveBar.style.display = "flex";
+      if (bannerSaveBtn) bannerSaveBtn.style.display = "inline-flex";
     });
 
     // ── Error handling & logging ───────────────────────────────────
@@ -525,6 +566,29 @@
         pseudoContent.innerHTML = marked.parse(data.pseudocode || "");
         codeContent.innerHTML   = marked.parse(data.code || "");
 
+        // Store raw markdown content for saving to local disk
+        currentLearningData = {
+          topic: data.topic || topic,
+          theory: data.theory || "",
+          pseudocode: data.pseudocode || "",
+          code: data.code || "",
+        };
+
+        // Reset Save Notes controls
+        if (saveBar) saveBar.style.display = "none";
+        if (viewNotesLink) viewNotesLink.style.display = "none";
+        if (bannerSaveBtn) {
+          bannerSaveBtn.style.display = "none";
+          bannerSaveBtn.disabled = false;
+          bannerSaveBtn.classList.remove("btn-saved");
+          bannerSaveBtn.innerHTML = '<span>💾</span> Save Notes';
+        }
+        if (saveNotesBtn) {
+          saveNotesBtn.disabled = false;
+          saveNotesBtn.classList.remove("btn-saved");
+          saveNotesBtn.innerHTML = '<span class="save-btn-icon">💾</span><span class="save-btn-text">Save Topic Notes</span>';
+        }
+
         // Reset tab state
         tabTheory.classList.add("active");
         tabPseudo.disabled = true;
@@ -554,6 +618,50 @@
         showScreen(inputScreen);
       }
     }
+
+    // ── Save Notes to Local Machine Folder ─────────────────────────
+    async function handleSaveNotes() {
+      if (!currentLearningData.topic) return;
+
+      const buttons = [saveNotesBtn, bannerSaveBtn].filter(Boolean);
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.innerHTML = btn === bannerSaveBtn ? '<span>⏳</span> Saving…' : '<span class="save-btn-icon">⏳</span><span class="save-btn-text">Saving to local folder…</span>';
+      });
+
+      try {
+        const response = await fetch("/dsa/save/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(currentLearningData),
+        });
+
+        const resData = await response.json();
+        if (response.ok && resData.success) {
+          buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.classList.add("btn-saved");
+            btn.innerHTML = btn === bannerSaveBtn ? '<span>✓</span> Notes Saved' : '<span class="save-btn-icon">✓</span><span class="save-btn-text">Saved to My Notes!</span>';
+          });
+          if (viewNotesLink) viewNotesLink.style.display = "inline-flex";
+        } else {
+          buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.innerHTML = btn === bannerSaveBtn ? '<span>💾</span> Save Notes' : '<span class="save-btn-icon">💾</span><span class="save-btn-text">Try Saving Again</span>';
+          });
+          showError("Save Failed", resData.error || "Could not save notes to directory.");
+        }
+      } catch (err) {
+        buttons.forEach(btn => {
+          btn.disabled = false;
+          btn.innerHTML = btn === bannerSaveBtn ? '<span>💾</span> Save Notes' : '<span class="save-btn-icon">💾</span><span class="save-btn-text">Try Saving Again</span>';
+        });
+        showError("Save Error", "Network error while saving notes to local folder.");
+      }
+    }
+
+    if (saveNotesBtn) saveNotesBtn.addEventListener("click", handleSaveNotes);
+    if (bannerSaveBtn) bannerSaveBtn.addEventListener("click", handleSaveNotes);
 
     learnBtn.addEventListener("click", startLearning);
     topicInput.addEventListener("keydown", (e) => {
