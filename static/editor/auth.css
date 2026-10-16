@@ -341,3 +341,131 @@ body {
   font-size: 0.8rem;
   color: #646979;
 }
+
+/* ── Profile Page Extras ─────────────────────────────────────────────────── */
+.profile-wrapper {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.profile-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #2a2c35;
+}
+
+.profile-avatar-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007acc 0%, #00d2ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 122, 204, 0.4);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.profile-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-display-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.profile-email {
+  font-size: 0.85rem;
+  color: #9da3b4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: rgba(0, 122, 204, 0.18);
+  border: 1px solid rgba(0, 122, 204, 0.4);
+  color: #38bdf8;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.form-textarea {
+  width: 100%;
+  background-color: #101114;
+  border: 1px solid #2d313d;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #007acc;
+  background-color: #0c0d10;
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.25);
+}
+
+.form-readonly-val {
+  background-color: #14151a;
+  border: 1px solid #242730;
+  color: #8b91a0;
+  cursor: not-allowed;
+}
+
+.profile-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid #363946;
+  background-color: transparent;
+  color: #9da3b4;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+
+.btn-secondary-link:hover {
+  background-color: #262831;
+  color: #ffffff;
+  border-color: #484c5c;
+}

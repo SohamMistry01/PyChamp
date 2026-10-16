@@ -10,6 +10,7 @@ from pyeditor.views import (
     login_view,
     register_view,
     logout_view,
+    profile_view,
 )
 from pyeditor.dsa_views import dsa_view, dsa_invoke
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("register/", register_view, name="register"),
     path("logout/", logout_view, name="logout"),
+    path("profile/", profile_view, name="profile"),
     path("run_code/", run_code, name="run_code"),
     path("dsa/", dsa_view, name="dsa"),
     path("dsa/invoke/", dsa_invoke, name="dsa_invoke"),

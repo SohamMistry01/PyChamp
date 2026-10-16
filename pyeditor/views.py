@@ -160,6 +160,43 @@ def logout_view(request):
 # ── Protected Application Views ───────────────────────────────────────────
 
 @login_required(login_url="login")
+def profile_view(request):
+    """
+    Render user profile and handle bio and experience level updates.
+    """
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        experience_level = request.POST.get("experience_level", "beginner").strip()
+        bio = request.POST.get("bio", "").strip()
+
+        # Update profile fields
+        if experience_level in dict(UserProfile.EXPERIENCE_CHOICES):
+            profile.experience_level = experience_level
+        profile.bio = bio
+        profile.save()
+
+        # Update user names if changed
+        request.user.first_name = first_name
+        request.user.last_name = last_name
+        request.user.save()
+
+        messages.success(request, "Your profile has been successfully updated!")
+        return redirect("profile")
+
+    return render(
+        request,
+        "profile.html",
+        {
+            "profile": profile,
+            "experience_choices": UserProfile.EXPERIENCE_CHOICES,
+        },
+    )
+
+
+@login_required(login_url="login")
 def editor_view(request):
     """Render the code editor workspace (protected)."""
     return render(request, "editor.html")

@@ -60,6 +60,15 @@ body {
   border-radius: 20px;
   font-size: 0.85rem;
   color: #e2e4ea;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.user-chip:hover {
+  background-color: #2e313d;
+  border-color: #007acc;
+  color: #ffffff;
 }
 
 .user-chip-icon {

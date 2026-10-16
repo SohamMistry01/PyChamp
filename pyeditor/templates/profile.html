@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile — PyChamp</title>
+  <link rel="stylesheet" href="{% static 'editor/auth.css' %}?v=2">
+  <link rel="stylesheet" href="{% static 'editor/editor.css' %}?v=4">
+</head>
+<body style="justify-content: flex-start; padding: 0;">
+
+  <!-- Header / Navbar -->
+  <header class="navbar" style="width: 100%;">
+    <div class="navbar-left">
+      <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+        <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
+        <h1 class="app-title">PyChamp</h1>
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a href="{% url 'editor' %}" class="btn btn-secondary">← Code Editor</a>
+      <a href="{% url 'dsa' %}" class="btn btn-secondary">🧠 DSA Tutor</a>
+      <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+    </div>
+  </header>
+
+  <!-- Main Profile Content -->
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 40px 16px;">
+    <div class="profile-wrapper">
+      <div class="auth-card" style="padding: 36px 34px;">
+        
+        <!-- User Avatar & Identity Header -->
+        <div class="profile-avatar-row">
+          <div class="profile-avatar-circle">
+            {{ request.user.username|make_list|first|upper }}
+          </div>
+          <div class="profile-user-info">
+            <h2 class="profile-display-name">
+              {{ request.user.first_name }} {{ request.user.last_name }}
+              {% if not request.user.first_name and not request.user.last_name %}
+                {{ request.user.username }}
+              {% endif %}
+            </h2>
+            <div class="profile-email">
+              @{{ request.user.username }} &bull; {{ request.user.email }}
+            </div>
+            <div class="profile-badge">
+              {% if profile.experience_level == 'advanced' %}
+                🚀 Advanced
+              {% elif profile.experience_level == 'intermediate' %}
+                ⚡ Intermediate
+              {% else %}
+                🌱 Beginner
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback Messages -->
+        {% if messages %}
+          <div class="messages-container">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                <span class="alert-icon">
+                  {% if message.tags == 'success' %}✓
+                  {% elif message.tags == 'error' or message.tags == 'danger' %}⚠️
+                  {% else %}ℹ️{% endif %}
+                </span>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Profile Update Form -->
+        <form method="POST" action="{% url 'profile' %}" class="auth-form">
+          {% csrf_token %}
+
+          <!-- Read-only Account Identifiers -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input
+                type="text"
+                class="form-input form-readonly-val"
+                value="{{ request.user.username }}"
+                readonly
+                disabled
+              >
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input
+                type="email"
+                class="form-input form-readonly-val"
+                value="{{ request.user.email }}"
+                readonly
+                disabled
+              >
+            </div>
+          </div>
+
+          <!-- Editable Names -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName" class="form-label">First Name</label>
+              <input
+                id="firstName"
+                type="text"
+                name="first_name"
+                class="form-input"
+                placeholder="First name"
+                value="{{ request.user.first_name }}"
+                autocomplete="given-name"
+              >
+            </div>
+            <div class="form-group">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input
+                id="lastName"
+                type="text"
+                name="last_name"
+                class="form-input"
+                placeholder="Last name"
+                value="{{ request.user.last_name }}"
+                autocomplete="family-name"
+              >
+            </div>
+          </div>
+
+          <!-- Experience Level Dropdown -->
+          <div class="form-group">
+            <label for="experienceLevel" class="form-label">Python Experience Level</label>
+            <div class="input-wrapper">
+              <select id="experienceLevel" name="experience_level" class="form-select">
+                {% for code, label in experience_choices %}
+                  <option value="{{ code }}" {% if profile.experience_level == code %}selected{% endif %}>
+                    {{ label }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-helper">
+              Helps customize learning recommendations and DSA agent insights.
+            </div>
+          </div>
+
+          <!-- Bio / Learning Goals -->
+          <div class="form-group">
+            <label for="bioInput" class="form-label">Bio &amp; Learning Goals</label>
+            <textarea
+              id="bioInput"
+              name="bio"
+              class="form-textarea"
+              rows="3"
+              placeholder="Tell us about what you are currently building or learning (e.g. Mastered binary search, building full-stack Django apps)..."
+            >{{ profile.bio }}</textarea>
+          </div>
+
+          <!-- Member Since info -->
+          <div class="form-helper" style="font-size: 0.8rem; color: #717686;">
+            Member since {{ request.user.date_joined|date:"F j, Y" }}
+          </div>
+
+          <!-- Actions -->
+          <div class="profile-actions-row">
+            <button type="submit" class="btn-submit" style="margin-top: 0; flex: 1;">
+              <span>💾</span>
+              <span>Save Changes</span>
+            </button>
+            <a href="{% url 'editor' %}" class="btn-secondary-link">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
