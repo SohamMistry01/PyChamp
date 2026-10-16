@@ -157,6 +157,38 @@ class SavedNotesTestCase(TestCase):
         self.assertNotContains(res, "💻 Code Editor")
         self.assertNotContains(res, "user-chip-icon")
 
+    def test_profile_page_icons_and_save_button(self):
+        self.client.login(username="testuser", password="password123")
+        res = self.client.get(reverse("profile"))
+        self.assertEqual(res.status_code, 200)
+        # Verify SVG icons are present in navbar & save button
+        self.assertContains(res, "icon icon-nav")
+        self.assertContains(res, "icon icon-btn")
+        self.assertContains(res, "Save Changes")
+        # Verify emojis are NOT present in profile navbar & save button
+        self.assertNotContains(res, "🏠 Home")
+        self.assertNotContains(res, "💾")
+        self.assertNotContains(res, "🚀 Advanced")
+
+    def test_saved_notes_page_icons(self):
+        self.client.login(username="testuser", password="password123")
+        res = self.client.get(reverse("saved_notes"))
+        self.assertEqual(res.status_code, 200)
+        # Verify SVG icons are present
+        self.assertContains(res, "icon icon-nav")
+        self.assertContains(res, "icon-badge")
+        self.assertContains(res, "icon-search")
+        # Verify 📁 folder emoji is preserved
+        self.assertContains(res, "Local storage: saved_notes/")
+        # Verify navbar/action emojis are NOT present
+        self.assertNotContains(res, "🏠 Home")
+        self.assertNotContains(res, "📚 Saved Notes")
+        self.assertNotContains(res, "🧠 DSA AI Tutor")
+        self.assertNotContains(res, "💻 Code Editor")
+        self.assertNotContains(res, "🗑️")
+
+
+
 
 
 

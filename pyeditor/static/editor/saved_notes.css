@@ -720,3 +720,72 @@ body {
     padding: 20px;
   }
 }
+
+/* ── SVG Icons ───────────────────────────────────────────────────────────── */
+.icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon-nav {
+  width: 15px;
+  height: 15px;
+}
+
+.icon-btn {
+  width: 15px;
+  height: 15px;
+}
+
+.icon-user-chip {
+  width: 15px;
+  height: 15px;
+  color: #7dd3fc;
+}
+
+.icon-file {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.icon-search {
+  width: 13px;
+  height: 13px;
+}
+
+.icon-badge {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.icon-trash {
+  width: 13px;
+  height: 13px;
+}
+
+.btn-admin {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-admin:hover {
+  background-color: rgba(239, 68, 68, 0.22);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+

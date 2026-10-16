@@ -7,6 +7,62 @@
   <title>User Profile — PyChamp</title>
   <link rel="stylesheet" href="{% static 'editor/auth.css' %}?v=2">
   <link rel="stylesheet" href="{% static 'editor/editor.css' %}?v=4">
+  <style>
+    /* ── SVG Icons ── */
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .icon-nav {
+      width: 15px;
+      height: 15px;
+    }
+
+    .icon-btn {
+      width: 18px;
+      height: 18px;
+    }
+
+    .badge-icon {
+      width: 13px;
+      height: 13px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .alert-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-admin {
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-admin:hover {
+      background-color: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
+  </style>
 </head>
 <body style="justify-content: flex-start; padding: 0;">
 
@@ -19,10 +75,58 @@
       </a>
     </div>
     <div class="navbar-right">
-      <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
-      <a href="{% url 'editor' %}" class="btn btn-secondary">💻 Code Editor</a>
-      <a href="{% url 'dsa' %}" class="btn btn-secondary">🧠 DSA Tutor</a>
-      <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+      <a href="{% url 'home' %}" class="btn btn-secondary" title="PyChamp Home">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="Saved DSA Notes">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Saved Notes</span>
+      </a>
+      <a href="{% url 'editor' %}" class="btn btn-secondary" title="Open Python Code Editor">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span>Code Editor</span>
+      </a>
+      <a href="{% url 'dsa' %}" class="btn btn-secondary" title="DSA AI Tutor">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+          <line x1="9" y1="1" x2="9" y2="4"></line>
+          <line x1="15" y1="1" x2="15" y2="4"></line>
+          <line x1="9" y1="20" x2="9" y2="23"></line>
+          <line x1="15" y1="20" x2="15" y2="23"></line>
+          <line x1="20" y1="9" x2="23" y2="9"></line>
+          <line x1="20" y1="14" x2="23" y2="14"></line>
+          <line x1="1" y1="9" x2="4" y2="9"></line>
+          <line x1="1" y1="14" x2="4" y2="14"></line>
+        </svg>
+        <span>DSA Tutor</span>
+      </a>
+      {% if request.user.is_superuser %}
+        <a href="{% url 'admin:index' %}" class="btn btn-admin" title="Open Django Admin Panel">
+          <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>Admin</span>
+        </a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Sign Out</span>
+      </a>
     </div>
   </header>
 
@@ -48,11 +152,22 @@
             </div>
             <div class="profile-badge">
               {% if profile.experience_level == 'advanced' %}
-                🚀 Advanced
+                <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Advanced</span>
               {% elif profile.experience_level == 'intermediate' %}
-                ⚡ Intermediate
+                <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <span>Intermediate</span>
               {% else %}
-                🌱 Beginner
+                <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="8"></circle>
+                  <path d="M12 8v8"></path>
+                  <path d="M8 12h8"></path>
+                </svg>
+                <span>Beginner</span>
               {% endif %}
             </div>
           </div>
@@ -64,9 +179,24 @@
             {% for message in messages %}
               <div class="alert alert-{{ message.tags }}">
                 <span class="alert-icon">
-                  {% if message.tags == 'success' %}✓
-                  {% elif message.tags == 'error' or message.tags == 'danger' %}⚠️
-                  {% else %}ℹ️{% endif %}
+                  {% if message.tags == 'success' %}
+                    <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  {% elif message.tags == 'error' or message.tags == 'danger' %}
+                    <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  {% else %}
+                    <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                  {% endif %}
                 </span>
                 <span>{{ message }}</span>
               </div>
@@ -167,7 +297,11 @@
           <!-- Actions -->
           <div class="profile-actions-row">
             <button type="submit" class="btn-submit" style="margin-top: 0; flex: 1;">
-              <span>💾</span>
+              <svg class="icon icon-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
               <span>Save Changes</span>
             </button>
             <a href="{% url 'editor' %}" class="btn-secondary-link">
