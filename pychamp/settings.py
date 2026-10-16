@@ -118,10 +118,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# For development (where your logo and css live)
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+# Static assets are located in pyeditor/static/ and discovered automatically
+# by django.contrib.staticfiles.finders.AppDirectoriesFinder.
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
 
 # For production (collecting static files into one place)
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
