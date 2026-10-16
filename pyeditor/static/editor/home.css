@@ -104,10 +104,6 @@ body {
   color: #ffffff;
 }
 
-.user-chip-icon {
-  font-size: 0.9rem;
-}
-
 .user-chip-name {
   font-weight: 600;
   max-width: 150px;
@@ -157,28 +153,68 @@ body {
   gap: 36px;
 }
 
-/* ── Hero / Welcome Section ──────────────────────────────────────────────── */
-.hero-section {
+/* ── Workspace Header (Replaces generic hero banner) ─────────────────────── */
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding-bottom: 2px;
+}
+
+.workspace-heading-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-.hero-greeting {
-  font-size: 1.85rem;
+.workspace-title {
+  font-size: 1.55rem;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: -0.5px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  letter-spacing: -0.4px;
 }
 
-.hero-subtitle {
-  font-size: 1rem;
-  color: #9da3b4;
-  max-width: 680px;
+.workspace-subtitle {
+  font-size: 0.94rem;
+  color: #8b90a0;
+  max-width: 640px;
   line-height: 1.5;
+}
+
+.workspace-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: #1a1b22;
+  border: 1px solid #282a35;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9499ab;
+  flex-shrink: 0;
+}
+
+.status-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseDotGreen 2s infinite ease-in-out;
+}
+
+@keyframes pulseDotGreen {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 680px) {
+  .workspace-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* ── Messages / Alerts ───────────────────────────────────────────────────── */
@@ -281,6 +317,9 @@ body {
   padding: 4px 10px;
   border-radius: 14px;
   letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Card Body Content */
@@ -322,7 +361,6 @@ body {
   border-radius: 4px;
 }
 
-/* Card Footer / Action Button */
 .card-action-btn {
   display: inline-flex;
   align-items: center;
@@ -335,6 +373,56 @@ body {
   border: 1px solid transparent;
   transition: all 0.15s ease;
   user-select: none;
+}
+
+/* ── SVG Icons ───────────────────────────────────────────────────────────── */
+.icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon-nav {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-user-chip {
+  width: 16px;
+  height: 16px;
+  color: #7dd3fc;
+}
+
+.icon-card {
+  width: 26px;
+  height: 26px;
+}
+
+.badge-icon {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon-arrow {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.module-card:hover .icon-arrow {
+  transform: translateX(4px);
+}
+
+.alert-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* ── Card 1: Code Editor Theme (Blue) ────────────────────────────────────── */

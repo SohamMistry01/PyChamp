@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PyChamp — Python Learning &amp; Coding Suite</title>
-  <link rel="stylesheet" href="{% static 'editor/home.css' %}?v=1">
+  <link rel="stylesheet" href="{% static 'editor/home.css' %}?v=2">
 </head>
 <body>
 
@@ -21,9 +21,18 @@
     
     <div class="navbar-right">
       {% if request.user.is_authenticated %}
-        <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved Notes">📚 Saved Notes</a>
+        <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved Notes">
+          <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span>Saved Notes</span>
+        </a>
         <a href="{% url 'profile' %}" class="user-chip" title="View &amp; Edit Profile">
-          <span class="user-chip-icon">👤</span>
+          <svg class="icon icon-user-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
           <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
         </a>
         <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
@@ -34,14 +43,18 @@
   <!-- ── Dashboard Container ─────────────────────────────────────────────── -->
   <main class="home-container">
     
-    <!-- Hero / Welcome Header -->
-    <section class="hero-section">
-      <h2 class="hero-greeting">
-        Welcome back, {{ request.user.first_name|default:request.user.username }} 👋
-      </h2>
-      <p class="hero-subtitle">
-        Your unified workspace to practice Python code, master data structures &amp; algorithms with multi-agent AI, and track your developer progress.
-      </p>
+    <!-- Workspace Header -->
+    <section class="workspace-header">
+      <div class="workspace-heading-wrap">
+        <h2 class="workspace-title">Workspace Modules</h2>
+        <p class="workspace-subtitle">
+          Select a tool below to practice Python code, master algorithmic patterns with AI, or review saved notes.
+        </p>
+      </div>
+      <div class="workspace-status-badge">
+        <span class="status-pulse-dot"></span>
+        <span>Environment Ready</span>
+      </div>
     </section>
 
     <!-- Feedback Messages -->
@@ -49,10 +62,25 @@
       <div class="messages-container">
         {% for message in messages %}
           <div class="alert alert-{{ message.tags }}">
-            <span>
-              {% if message.tags == 'success' %}✓
-              {% elif message.tags == 'error' or message.tags == 'danger' %}⚠️
-              {% else %}ℹ️{% endif %}
+            <span class="alert-icon-wrap">
+              {% if message.tags == 'success' %}
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              {% else %}
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              {% endif %}
             </span>
             <span>{{ message }}</span>
           </div>
@@ -66,7 +94,12 @@
       <!-- Card 1: Python Code Editor -->
       <a href="{% url 'editor' %}" class="module-card card-editor" title="Open Python Code Editor">
         <div class="card-header-row">
-          <div class="card-icon-box">💻</div>
+          <div class="card-icon-box">
+            <svg class="icon icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"></polyline>
+              <line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+          </div>
           <span class="card-badge">Live Scratchpad</span>
         </div>
         <div class="card-body">
@@ -82,14 +115,30 @@
         </div>
         <div class="card-action-btn">
           <span>Launch Editor</span>
-          <span>→</span>
+          <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </div>
       </a>
 
       <!-- Card 2: AI DSA Tutor -->
       <a href="{% url 'dsa' %}" class="module-card card-dsa" title="Open AI DSA Tutor">
         <div class="card-header-row">
-          <div class="card-icon-box">🧠</div>
+          <div class="card-icon-box">
+            <svg class="icon icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+              <rect x="9" y="9" width="6" height="6"></rect>
+              <line x1="9" y1="1" x2="9" y2="4"></line>
+              <line x1="15" y1="1" x2="15" y2="4"></line>
+              <line x1="9" y1="20" x2="9" y2="23"></line>
+              <line x1="15" y1="20" x2="15" y2="23"></line>
+              <line x1="20" y1="9" x2="23" y2="9"></line>
+              <line x1="20" y1="14" x2="23" y2="14"></line>
+              <line x1="1" y1="9" x2="4" y2="9"></line>
+              <line x1="1" y1="14" x2="4" y2="14"></line>
+            </svg>
+          </div>
           <span class="card-badge">Multi-Agent AI</span>
         </div>
         <div class="card-body">
@@ -105,21 +154,40 @@
         </div>
         <div class="card-action-btn">
           <span>Start Learning</span>
-          <span>→</span>
+          <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </div>
       </a>
 
       <!-- Card 3: User Profile -->
       <a href="{% url 'profile' %}" class="module-card card-profile" title="Manage Profile">
         <div class="card-header-row">
-          <div class="card-icon-box">👤</div>
+          <div class="card-icon-box">
+            <svg class="icon icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
           <span class="card-badge">
             {% if profile.experience_level == 'advanced' %}
-              🚀 Advanced
+              <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Advanced</span>
             {% elif profile.experience_level == 'intermediate' %}
-              ⚡ Intermediate
+              <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              <span>Intermediate</span>
             {% else %}
-              🌱 Beginner
+              <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8"></circle>
+                <path d="M12 8v8"></path>
+                <path d="M8 12h8"></path>
+              </svg>
+              <span>Beginner</span>
             {% endif %}
           </span>
         </div>
@@ -136,14 +204,22 @@
         </div>
         <div class="card-action-btn">
           <span>Manage Profile</span>
-          <span>→</span>
+          <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </div>
       </a>
 
       <!-- Card 4: Saved DSA Notes -->
       <a href="{% url 'saved_notes' %}" class="module-card card-notes" title="Open Saved DSA Notes Library">
         <div class="card-header-row">
-          <div class="card-icon-box">📚</div>
+          <div class="card-icon-box">
+            <svg class="icon icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </div>
           <span class="card-badge">
             {% if saved_notes_count %}
               {{ saved_notes_count }} Topic{{ saved_notes_count|pluralize }} Saved
@@ -166,7 +242,10 @@
         </div>
         <div class="card-action-btn">
           <span>Browse Library</span>
-          <span>→</span>
+          <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </div>
       </a>
 
@@ -181,3 +260,4 @@
 
 </body>
 </html>
+
