@@ -5,6 +5,7 @@ URL configuration for pychamp project.
 from django.contrib import admin
 from django.urls import path
 from pyeditor.views import (
+    home_view,
     editor_view,
     run_code,
     login_view,
@@ -16,7 +17,8 @@ from pyeditor.dsa_views import dsa_view, dsa_invoke
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", editor_view, name="editor"),
+    path("", home_view, name="home"),
+    path("editor/", editor_view, name="editor"),
     path("login/", login_view, name="login"),
     path("register/", register_view, name="register"),
     path("logout/", logout_view, name="logout"),

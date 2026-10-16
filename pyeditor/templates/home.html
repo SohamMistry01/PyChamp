@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyChamp — Python Learning &amp; Coding Suite</title>
+  <link rel="stylesheet" href="{% static 'editor/home.css' %}?v=1">
+</head>
+<body>
+
+  <!-- ── Top Navbar ──────────────────────────────────────────────────────── -->
+  <header class="navbar">
+    <a href="{% url 'home' %}" class="navbar-brand-link" title="PyChamp Home">
+      <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
+      <div class="app-title-group">
+        <h1 class="app-title">PyChamp</h1>
+        <span class="version-pill">v1.0</span>
+      </div>
+    </a>
+    
+    <div class="navbar-right">
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="user-chip" title="View &amp; Edit Profile">
+          <span class="user-chip-icon">👤</span>
+          <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- ── Dashboard Container ─────────────────────────────────────────────── -->
+  <main class="home-container">
+    
+    <!-- Hero / Welcome Header -->
+    <section class="hero-section">
+      <h2 class="hero-greeting">
+        Welcome back, {{ request.user.first_name|default:request.user.username }} 👋
+      </h2>
+      <p class="hero-subtitle">
+        Your unified workspace to practice Python code, master data structures &amp; algorithms with multi-agent AI, and track your developer progress.
+      </p>
+    </section>
+
+    <!-- Feedback Messages -->
+    {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            <span>
+              {% if message.tags == 'success' %}✓
+              {% elif message.tags == 'error' or message.tags == 'danger' %}⚠️
+              {% else %}ℹ️{% endif %}
+            </span>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- ── 2x2 Modules Grid ────────────────────────────────────────────── -->
+    <section class="cards-grid">
+
+      <!-- Card 1: Python Code Editor -->
+      <a href="{% url 'editor' %}" class="module-card card-editor" title="Open Python Code Editor">
+        <div class="card-header-row">
+          <div class="card-icon-box">💻</div>
+          <span class="card-badge">Live Scratchpad</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Python Code Editor</h3>
+          <p class="card-description">
+            Write, run, and debug Python code directly in your browser with instant subprocess output, syntax helpers, and error diagnostics.
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">Python 3</span>
+            <span class="card-tag">Standard Output</span>
+            <span class="card-tag">Fast Execution</span>
+          </div>
+        </div>
+        <div class="card-action-btn">
+          <span>Launch Editor</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Card 2: AI DSA Tutor -->
+      <a href="{% url 'dsa' %}" class="module-card card-dsa" title="Open AI DSA Tutor">
+        <div class="card-header-row">
+          <div class="card-icon-box">🧠</div>
+          <span class="card-badge">Multi-Agent AI</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">AI DSA Tutor</h3>
+          <p class="card-description">
+            Master Data Structures &amp; Algorithms through synchronized AI agents generating in-depth theory, step-by-step pseudocode, and production Python implementations.
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">Theory Agent</span>
+            <span class="card-tag">Pseudocode</span>
+            <span class="card-tag">Python Solutions</span>
+          </div>
+        </div>
+        <div class="card-action-btn">
+          <span>Start Learning</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Card 3: User Profile -->
+      <a href="{% url 'profile' %}" class="module-card card-profile" title="Manage Profile">
+        <div class="card-header-row">
+          <div class="card-icon-box">👤</div>
+          <span class="card-badge">
+            {% if profile.experience_level == 'advanced' %}
+              🚀 Advanced
+            {% elif profile.experience_level == 'intermediate' %}
+              ⚡ Intermediate
+            {% else %}
+              🌱 Beginner
+            {% endif %}
+          </span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">User Profile &amp; Settings</h3>
+          <p class="card-description">
+            Customize your learning identity, update your bio and personal milestones, and set your programming experience level to optimize AI recommendations.
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">Experience Level</span>
+            <span class="card-tag">Bio &amp; Goals</span>
+            <span class="card-tag">Account Info</span>
+          </div>
+        </div>
+        <div class="card-action-btn">
+          <span>Manage Profile</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Card 4: Upcoming / Dummy Module -->
+      <div class="module-card card-dummy" title="Coming Soon">
+        <div class="card-header-row">
+          <div class="card-icon-box">🏆</div>
+          <span class="card-badge">Coming Soon</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Challenges &amp; Quizzes</h3>
+          <p class="card-description">
+            Interactive LeetCode-style coding challenges, automated unit test suites, timed quizzes, and skill badges to accelerate your algorithm mastery.
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">Unit Tests</span>
+            <span class="card-tag">Timed Contests</span>
+            <span class="card-tag">Leaderboards</span>
+          </div>
+        </div>
+        <div class="card-action-btn">
+          <span>In Development</span>
+          <span>⏳</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+  <footer class="home-footer">
+    PyChamp &bull; Next-Gen Python Coding &amp; AI Algorithms Learning Environment
+  </footer>
+
+</body>
+</html>

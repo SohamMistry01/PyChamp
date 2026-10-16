@@ -21,7 +21,7 @@ def login_view(request):
     Handle user login via username or email address.
     """
     if request.user.is_authenticated:
-        return redirect("editor")
+        return redirect("home")
 
     if request.method == "POST":
         username_or_email = request.POST.get("username", "").strip()
@@ -62,7 +62,7 @@ def login_view(request):
                 next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
             ):
                 return redirect(next_url)
-            return redirect("editor")
+            return redirect("home")
         else:
             messages.error(request, "Invalid username/email or password.")
             return render(request, "login.html", {"username": username_or_email})
@@ -75,7 +75,7 @@ def register_view(request):
     Handle new user registration, profile creation, and auto-login.
     """
     if request.user.is_authenticated:
-        return redirect("editor")
+        return redirect("home")
 
     if request.method == "POST":
         full_name = request.POST.get("full_name", "").strip()
@@ -143,7 +143,7 @@ def register_view(request):
         # Log user in
         auth_login(request, user)
         messages.success(request, f"Welcome to PyChamp, {user.username}! Your account has been created.")
-        return redirect("editor")
+        return redirect("home")
 
     return render(request, "register.html")
 
@@ -194,6 +194,15 @@ def profile_view(request):
             "experience_choices": UserProfile.EXPERIENCE_CHOICES,
         },
     )
+
+
+@login_required(login_url="login")
+def home_view(request):
+    """
+    Render the PyChamp Home Dashboard featuring the 2x2 modular cards layout.
+    """
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    return render(request, "home.html", {"profile": profile})
 
 
 @login_required(login_url="login")

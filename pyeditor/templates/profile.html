@@ -13,13 +13,14 @@
   <!-- Header / Navbar -->
   <header class="navbar" style="width: 100%;">
     <div class="navbar-left">
-      <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+      <a href="{% url 'home' %}" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
         <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
         <h1 class="app-title">PyChamp</h1>
       </a>
     </div>
     <div class="navbar-right">
-      <a href="{% url 'editor' %}" class="btn btn-secondary">← Code Editor</a>
+      <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
+      <a href="{% url 'editor' %}" class="btn btn-secondary">💻 Code Editor</a>
       <a href="{% url 'dsa' %}" class="btn btn-secondary">🧠 DSA Tutor</a>
       <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
     </div>

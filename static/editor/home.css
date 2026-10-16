@@ -1,0 +1,467 @@
+/* ==========================================================================
+   PyChamp — Home Dashboard Styles
+   Theme: Deep Dark Studio (#141519, #1c1d22, Accent Colors)
+   2x2 Responsive Modular Grid Layout
+   ========================================================================== */
+
+/* ── Reset & Base ────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #141519;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(0, 122, 204, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 15% 70%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: #e2e4ea;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 28px;
+  background-color: #1c1d22;
+  border-bottom: 1px solid #2a2c35;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.navbar-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logo {
+  height: 38px;
+  width: auto;
+  border-radius: 6px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 122, 204, 0.35));
+}
+
+.app-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.version-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(0, 122, 204, 0.18);
+  border: 1px solid rgba(0, 122, 204, 0.35);
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background-color: #242630;
+  border: 1px solid #363946;
+  border-radius: 20px;
+  font-size: 0.86rem;
+  color: #e2e4ea;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.user-chip:hover {
+  background-color: #2c2f3d;
+  border-color: #007acc;
+  color: #ffffff;
+}
+
+.user-chip-icon {
+  font-size: 0.9rem;
+}
+
+.user-chip-name {
+  font-weight: 600;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  user-select: none;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #9da3b4;
+  border: 1px solid #363946;
+}
+
+.btn-secondary:hover {
+  background-color: #262831;
+  color: #ffffff;
+  border-color: #484c5c;
+}
+
+/* ── Main Dashboard Container ────────────────────────────────────────────── */
+.home-container {
+  flex: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* ── Hero / Welcome Section ──────────────────────────────────────────────── */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero-greeting {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: #9da3b4;
+  max-width: 680px;
+  line-height: 1.5;
+}
+
+/* ── Messages / Alerts ───────────────────────────────────────────────────── */
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.alert-success {
+  background-color: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #86efac;
+}
+
+.alert-info {
+  background-color: rgba(0, 122, 204, 0.12);
+  border: 1px solid rgba(0, 122, 204, 0.35);
+  color: #7dd3fc;
+}
+
+/* ── 2x2 Grid Layout ─────────────────────────────────────────────────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 860px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Modular Dashboard Card ──────────────────────────────────────────────── */
+.module-card {
+  background-color: #1c1d22;
+  border: 1px solid #2a2c35;
+  border-radius: 14px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.module-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.25s ease;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  border-color: #3e4250;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55);
+}
+
+/* Card Header (Icon + Badge) */
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.card-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  letter-spacing: 0.2px;
+}
+
+/* Card Body Content */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.card-description {
+  font-size: 0.92rem;
+  color: #9da3b4;
+  line-height: 1.55;
+}
+
+/* Tags row */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.card-tag {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #717686;
+  background-color: #141519;
+  border: 1px solid #282a33;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Card Footer / Action Button */
+.card-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+/* ── Card 1: Code Editor Theme (Blue) ────────────────────────────────────── */
+.card-editor::before {
+  background: linear-gradient(90deg, #007acc, #38bdf8);
+}
+.card-editor .card-icon-box {
+  background: rgba(0, 122, 204, 0.15);
+  border: 1px solid rgba(0, 122, 204, 0.35);
+  color: #38bdf8;
+}
+.card-editor .card-badge {
+  background: rgba(0, 122, 204, 0.16);
+  border: 1px solid rgba(0, 122, 204, 0.35);
+  color: #7dd3fc;
+}
+.card-editor .card-action-btn {
+  background-color: #007acc;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.35);
+}
+.card-editor:hover .card-action-btn {
+  background-color: #0090f0;
+  box-shadow: 0 6px 18px rgba(0, 122, 204, 0.5);
+}
+
+/* ── Card 2: DSA Tutor Theme (Purple) ────────────────────────────────────── */
+.card-dsa::before {
+  background: linear-gradient(90deg, #8b5cf6, #c084fc);
+}
+.card-dsa .card-icon-box {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #c084fc;
+}
+.card-dsa .card-badge {
+  background: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #d8b4fe;
+}
+.card-dsa .card-action-btn {
+  background-color: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+.card-dsa:hover .card-action-btn {
+  background-color: #8b5cf6;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.5);
+}
+
+/* ── Card 3: User Profile Theme (Emerald) ────────────────────────────────── */
+.card-profile::before {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.card-profile .card-icon-box {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+.card-profile .card-badge {
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #86efac;
+}
+.card-profile .card-action-btn {
+  background-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+}
+.card-profile:hover .card-action-btn {
+  background-color: #10b981;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
+}
+
+/* ── Card 4: Dummy / Coming Soon (Amber / Neutral) ────────────────────────── */
+.card-dummy {
+  opacity: 0.85;
+  cursor: default;
+}
+.card-dummy::before {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.card-dummy:hover {
+  transform: none;
+  border-color: #2a2c35;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+.card-dummy .card-icon-box {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+.card-dummy .card-badge {
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.card-dummy .card-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24;
+  animation: pulseDot 2s infinite ease-in-out;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.card-dummy .card-action-btn {
+  background-color: #242630;
+  border: 1px solid #363946;
+  color: #9da3b4;
+  cursor: not-allowed;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.home-footer {
+  margin-top: auto;
+  padding: 24px 28px;
+  border-top: 1px solid #20222a;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #646979;
+}

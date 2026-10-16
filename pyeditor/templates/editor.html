@@ -279,11 +279,14 @@
   <!-- Header / Navbar -->
   <header class="navbar">
     <div class="navbar-left">
-      <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
-      <h1 class="app-title">Python Code Editor</h1>
+      <a href="{% url 'home' %}" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+        <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="logo">
+        <h1 class="app-title">Python Code Editor</h1>
+      </a>
     </div>
     <div class="navbar-right">
-      <a href="/dsa/" class="btn btn-secondary" title="DSA AI Tutor">🧠 DSA Tutor</a>
+      <a href="{% url 'home' %}" class="btn btn-secondary" title="PyChamp Home">🏠 Home</a>
+      <a href="{% url 'dsa' %}" class="btn btn-secondary" title="DSA AI Tutor">🧠 DSA Tutor</a>
       <button id="clearBtn" class="btn btn-secondary" type="button" title="Clear code in editor">Clear</button>
       <button id="runBtn" class="btn btn-primary" type="button" title="Execute script (Ctrl + Enter)">
         <span>▶</span> Run
