@@ -141,6 +141,28 @@ body {
   border-color: #484c5c;
 }
 
+.btn-admin {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-admin:hover {
+  background-color: rgba(239, 68, 68, 0.22);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+
 /* ── Main Dashboard Container ────────────────────────────────────────────── */
 .home-container {
   flex: 1;
@@ -153,7 +175,70 @@ body {
   gap: 36px;
 }
 
-/* ── Workspace Header (Replaces generic hero banner) ─────────────────────── */
+/* ── Platform Overview Card ──────────────────────────────────────────────── */
+.platform-intro {
+  background: linear-gradient(135deg, rgba(28, 30, 38, 0.75), rgba(19, 21, 26, 0.95));
+  border: 1px solid #2a2d39;
+  border-radius: 12px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.platform-intro::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #007acc, #8b5cf6, #f59e0b);
+}
+
+.intro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(0, 122, 204, 0.12);
+  border: 1px solid rgba(0, 122, 204, 0.28);
+  padding: 3px 10px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.icon-intro {
+  width: 13px;
+  height: 13px;
+  color: #38bdf8;
+}
+
+.intro-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.intro-description {
+  font-size: 0.94rem;
+  color: #9ba1b4;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.intro-description strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ── Workspace Header ─────────────────────────────────────────────────────── */
 .workspace-header {
   display: flex;
   justify-content: space-between;

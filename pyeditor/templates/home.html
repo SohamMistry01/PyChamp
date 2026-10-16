@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PyChamp — Python Learning &amp; Coding Suite</title>
+  <title>PyChamp - Python Learning &amp; Coding Suite</title>
   <link rel="stylesheet" href="{% static 'editor/home.css' %}?v=2">
 </head>
 <body>
@@ -21,6 +21,14 @@
     
     <div class="navbar-right">
       {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser %}
+          <a href="{% url 'admin:index' %}" class="btn btn-admin" title="Open Django Admin Panel">
+            <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Admin</span>
+          </a>
+        {% endif %}
         <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved Notes">
           <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
@@ -43,7 +51,21 @@
   <!-- ── Dashboard Container ─────────────────────────────────────────────── -->
   <main class="home-container">
     
-    <!-- Workspace Header -->
+    <!-- Platform Overview & Capabilities -->
+    <section class="platform-intro">
+      <div class="intro-badge">
+        <svg class="icon icon-intro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        <span>About PyChamp</span>
+      </div>
+      <h2 class="intro-heading">Next-Gen Python &amp; Algorithms Learning Suite</h2>
+      <p class="intro-description">
+        <strong>PyChamp</strong> is an intelligent developer ecosystem engineered to accelerate your Python mastery and algorithmic problem-solving. It unifies a live server-side Python code editor, a concurrent multi-agent AI DSA tutor powered by LangGraph and Groq, and a local personal study archive. Whether you are running isolated scripts, breaking down complex data structures from intuition to implementation, or revisiting offline notes with zero token overhead, PyChamp provides a focused, modern workspace for every step of your programming journey.
+      </p>
+    </section>
+
+    <!-- Workspace Modules Header -->
     <section class="workspace-header">
       <div class="workspace-heading-wrap">
         <h2 class="workspace-title">Workspace Modules</h2>

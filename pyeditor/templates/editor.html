@@ -273,6 +273,52 @@
     .output-area::-webkit-scrollbar-thumb:hover {
       background: #3e4252;
     }
+
+    /* ── SVG Icons ── */
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .icon-nav {
+      width: 15px;
+      height: 15px;
+    }
+
+    .icon-run {
+      width: 14px;
+      height: 14px;
+    }
+
+    .icon-user-chip {
+      width: 15px;
+      height: 15px;
+      color: #7dd3fc;
+    }
+
+    .btn-admin {
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-admin:hover {
+      background-color: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
   </style>
 </head>
 <body>
@@ -285,19 +331,72 @@
       </a>
     </div>
     <div class="navbar-right">
-      <a href="{% url 'home' %}" class="btn btn-secondary" title="PyChamp Home">🏠 Home</a>
-      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="Saved DSA Notes">📚 Saved Notes</a>
-      <a href="{% url 'dsa' %}" class="btn btn-secondary" title="DSA AI Tutor">🧠 DSA Tutor</a>
-      <button id="clearBtn" class="btn btn-secondary" type="button" title="Clear code in editor">Clear</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary" title="PyChamp Home">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="Saved DSA Notes">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Saved Notes</span>
+      </a>
+      <a href="{% url 'dsa' %}" class="btn btn-secondary" title="DSA AI Tutor">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+          <line x1="9" y1="1" x2="9" y2="4"></line>
+          <line x1="15" y1="1" x2="15" y2="4"></line>
+          <line x1="9" y1="20" x2="9" y2="23"></line>
+          <line x1="15" y1="20" x2="15" y2="23"></line>
+          <line x1="20" y1="9" x2="23" y2="9"></line>
+          <line x1="20" y1="14" x2="23" y2="14"></line>
+          <line x1="1" y1="9" x2="4" y2="9"></line>
+          <line x1="1" y1="14" x2="4" y2="14"></line>
+        </svg>
+        <span>DSA Tutor</span>
+      </a>
+      <button id="clearBtn" class="btn btn-secondary" type="button" title="Clear code in editor">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span>Clear</span>
+      </button>
       <button id="runBtn" class="btn btn-primary" type="button" title="Execute script (Ctrl + Enter)">
-        <span>▶</span> Run
+        <svg class="icon icon-run" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <polygon points="6 3 20 12 6 21 6 3"></polygon>
+        </svg>
+        <span>Run</span>
       </button>
       {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser %}
+          <a href="{% url 'admin:index' %}" class="btn btn-admin" title="Open Django Admin Panel">
+            <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Admin</span>
+          </a>
+        {% endif %}
         <a href="{% url 'profile' %}" class="user-chip" title="View & Edit Profile">
-          <span class="user-chip-icon">👤</span>
+          <svg class="icon icon-user-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
           <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
         </a>
-        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">
+          <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Sign Out</span>
+        </a>
       {% endif %}
     </div>
   </header>

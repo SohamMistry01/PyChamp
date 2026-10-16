@@ -125,6 +125,47 @@
       from { opacity: 0; transform: translate(-50%, 8px); }
       to { opacity: 1; transform: translate(-50%, 0); }
     }
+
+    /* ── SVG Icons ── */
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .icon-nav {
+      width: 15px;
+      height: 15px;
+    }
+
+    .icon-user-chip {
+      width: 15px;
+      height: 15px;
+      color: #7dd3fc;
+    }
+
+    .btn-admin {
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-admin:hover {
+      background-color: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
   </style>
 </head>
 <body>
@@ -138,15 +179,51 @@
       </a>
     </div>
     <div class="navbar-right">
-      <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Home</a>
-      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved DSA Notes">📚 Saved Notes</a>
-      <a href="{% url 'editor' %}" class="btn btn-secondary">💻 Code Editor</a>
+      <a href="{% url 'home' %}" class="btn btn-secondary" title="PyChamp Home">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="{% url 'saved_notes' %}" class="btn btn-secondary" title="View Saved DSA Notes">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Saved Notes</span>
+      </a>
+      <a href="{% url 'editor' %}" class="btn btn-secondary" title="Open Python Code Editor">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span>Code Editor</span>
+      </a>
       {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser %}
+          <a href="{% url 'admin:index' %}" class="btn btn-admin" title="Open Django Admin Panel">
+            <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Admin</span>
+          </a>
+        {% endif %}
         <a href="{% url 'profile' %}" class="user-chip" title="View & Edit Profile">
-          <span class="user-chip-icon">👤</span>
+          <svg class="icon icon-user-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
           <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
         </a>
-        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">
+          <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Sign Out</span>
+        </a>
       {% endif %}
     </div>
   </header>

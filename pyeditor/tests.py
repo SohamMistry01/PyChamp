@@ -97,3 +97,67 @@ class SavedNotesTestCase(TestCase):
         self.assertTrue(c_data["success"])
         self.assertEqual(c_data["content"], "Quick Sort Theory")
 
+    def test_home_admin_button_visibility(self):
+        # 1. Regular user should NOT see the Admin button
+        self.client.login(username="testuser", password="password123")
+        res_regular = self.client.get(reverse("home"))
+        self.assertEqual(res_regular.status_code, 200)
+        self.assertNotContains(res_regular, "btn-admin")
+        self.assertNotContains(res_regular, reverse("admin:index"))
+
+        # 2. Superuser SHOULD see the Admin button
+        admin_user = User.objects.create_superuser(
+            username="adminuser",
+            email="admin@example.com",
+            password="adminpassword123",
+        )
+        self.client.login(username="adminuser", password="adminpassword123")
+        res_admin = self.client.get(reverse("home"))
+        self.assertEqual(res_admin.status_code, 200)
+        self.assertContains(res_admin, "btn-admin")
+        self.assertContains(res_admin, reverse("admin:index"))
+
+    def test_home_page_intro_and_modules(self):
+        self.client.login(username="testuser", password="password123")
+        res = self.client.get(reverse("home"))
+        self.assertEqual(res.status_code, 200)
+        # Verify intro section with PyChamp description exists
+        self.assertContains(res, "platform-intro")
+        self.assertContains(res, "About PyChamp")
+        self.assertContains(res, "Next-Gen Python &amp; Algorithms Learning Suite")
+        # Verify workspace modules section exists below intro
+        self.assertContains(res, "workspace-header")
+        self.assertContains(res, "Workspace Modules")
+        self.assertContains(res, "cards-grid")
+
+    def test_editor_page_navbar_icons(self):
+        self.client.login(username="testuser", password="password123")
+        res = self.client.get(reverse("editor"))
+        self.assertEqual(res.status_code, 200)
+        # Verify SVG icons are present in navbar
+        self.assertContains(res, "icon icon-nav")
+        self.assertContains(res, "icon icon-run")
+        self.assertContains(res, "icon icon-user-chip")
+        # Verify emojis are NOT present in editor navbar
+        self.assertNotContains(res, "🏠")
+        self.assertNotContains(res, "📚")
+        self.assertNotContains(res, "🧠")
+        self.assertNotContains(res, "👤")
+
+    def test_dsa_page_navbar_icons(self):
+        self.client.login(username="testuser", password="password123")
+        res = self.client.get(reverse("dsa"))
+        self.assertEqual(res.status_code, 200)
+        # Verify SVG icons are present in navbar
+        self.assertContains(res, "icon icon-nav")
+        self.assertContains(res, "icon icon-user-chip")
+        # Verify navbar emojis are NOT present
+        self.assertNotContains(res, "🏠 Home")
+        self.assertNotContains(res, "📚 Saved Notes")
+        self.assertNotContains(res, "💻 Code Editor")
+        self.assertNotContains(res, "user-chip-icon")
+
+
+
+
+
