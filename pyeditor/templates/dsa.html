@@ -8,6 +8,124 @@
   <link rel="stylesheet" href="{% static 'editor/dsa.css' %}?v=1">
   <!-- Marked.js for Markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* ── Enhanced Error Banner & Diagnostic Log Drawer ── */
+    .toast.error-banner {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(860px, 94vw);
+      max-height: 80vh;
+      overflow-y: auto;
+      background-color: #241416;
+      border: 1px solid #7f282f;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .toast-main-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+    }
+    .toast-message-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+    .toast-headline-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast-headline-icon {
+      font-size: 1.15rem;
+    }
+    .toast-headline {
+      color: #ff6b6b;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .toast-message-text {
+      color: #fca5a5;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      margin: 0;
+      word-break: break-word;
+    }
+    .toast-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .toast-action-btn {
+      background: #3c191d;
+      border: 1px solid #7f282f;
+      color: #fed7d7;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .toast-action-btn:hover {
+      background: #5c2027;
+      border-color: #a83a44;
+      color: #ffffff;
+    }
+    .toast-details-drawer {
+      border-top: 1px solid #4d1c21;
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .toast-details-meta {
+      font-size: 0.78rem;
+      color: #e2a0a0;
+      font-family: Consolas, "Fira Code", monospace;
+    }
+    .toast-traceback-box {
+      background: #11080a;
+      border: 1px solid #4a191e;
+      border-radius: 6px;
+      padding: 12px;
+      color: #fca5a5;
+      font-family: Consolas, "Fira Code", monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      max-height: 260px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+    .toast-traceback-box::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .toast-traceback-box::-webkit-scrollbar-thumb {
+      background: #4a191e;
+      border-radius: 3px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, 8px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+  </style>
 </head>
 <body>
 
@@ -121,10 +239,26 @@
     </div>
   </section>
 
-  <!-- ── Error Toast ────────────────────────────────────────────────── -->
-  <div id="errorToast" class="toast" style="display:none;">
-    <span id="errorMsg"></span>
-    <button class="toast-close" id="toastClose">&times;</button>
+  <!-- ── Error Banner / Log Inspector ─────────────────────────────── -->
+  <div id="errorToast" class="toast error-banner" style="display:none;" role="alert">
+    <div class="toast-main-row">
+      <div class="toast-message-col">
+        <div class="toast-headline-wrap">
+          <span class="toast-headline-icon">⚠️</span>
+          <strong class="toast-headline" id="errorTitle">Server Error</strong>
+        </div>
+        <p id="errorMsg" class="toast-message-text"></p>
+      </div>
+      <div class="toast-actions">
+        <button id="toggleErrorLogBtn" class="toast-action-btn" type="button" style="display:none;">View Log</button>
+        <button id="copyErrorLogBtn" class="toast-action-btn" type="button" style="display:none;">Copy Log</button>
+        <button class="toast-close" id="toastClose" type="button" title="Dismiss">&times;</button>
+      </div>
+    </div>
+    <div id="errorDetailsContainer" class="toast-details-drawer" style="display:none;">
+      <div class="toast-details-meta" id="errorMeta"></div>
+      <pre class="toast-traceback-box" id="errorTraceback"></pre>
+    </div>
   </div>
 
   <script>
@@ -137,9 +271,17 @@
     const loadingTopic  = document.getElementById("loadingTopic");
     const resultTopic   = document.getElementById("resultTopic");
     const newTopicBtn   = document.getElementById("newTopicBtn");
-    const errorToast    = document.getElementById("errorToast");
-    const errorMsg      = document.getElementById("errorMsg");
-    const toastClose    = document.getElementById("toastClose");
+
+    // Error UI refs
+    const errorToast            = document.getElementById("errorToast");
+    const errorTitle            = document.getElementById("errorTitle");
+    const errorMsg              = document.getElementById("errorMsg");
+    const toastClose            = document.getElementById("toastClose");
+    const toggleErrorLogBtn     = document.getElementById("toggleErrorLogBtn");
+    const copyErrorLogBtn       = document.getElementById("copyErrorLogBtn");
+    const errorDetailsContainer = document.getElementById("errorDetailsContainer");
+    const errorMeta             = document.getElementById("errorMeta");
+    const errorTraceback        = document.getElementById("errorTraceback");
 
     // Tab buttons & panels
     const tabTheory = document.getElementById("tabTheory");
@@ -207,19 +349,98 @@
       activateTab(tabCode, panelCode);
     });
 
-    // ── Error toast ────────────────────────────────────────────────
-    function showError(msg) {
-      errorMsg.textContent = msg;
+    // ── Error handling & logging ───────────────────────────────────
+    let currentRawErrorLog = "";
+    let errorToastTimer = null;
+
+    function showError(title, msg, details = null) {
+      if (errorToastTimer) {
+        clearTimeout(errorToastTimer);
+        errorToastTimer = null;
+      }
+
+      errorTitle.textContent = title || "Error";
+      errorMsg.textContent = msg || "An unexpected error occurred.";
+
+      if (details) {
+        currentRawErrorLog = details.rawLog || JSON.stringify(details, null, 2);
+
+        let metaParts = [];
+        if (details.status) metaParts.push(`Status: ${details.status} ${details.statusText || ""}`);
+        if (details.error_type) metaParts.push(`Type: ${details.error_type}`);
+        if (details.topic) metaParts.push(`Topic: "${details.topic}"`);
+        if (details.timestamp) metaParts.push(`Time: ${details.timestamp}`);
+        errorMeta.textContent = metaParts.join(" | ");
+
+        if (details.traceback) {
+          errorTraceback.textContent = details.traceback;
+        } else if (details.rawLog) {
+          errorTraceback.textContent = details.rawLog;
+        } else {
+          errorTraceback.textContent = JSON.stringify(details, null, 2);
+        }
+
+        toggleErrorLogBtn.style.display = "inline-block";
+        copyErrorLogBtn.style.display = "inline-block";
+        toggleErrorLogBtn.textContent = "View Error Log";
+        errorDetailsContainer.style.display = "none";
+
+        // Structured console logging with full error trace
+        console.group("%c[DSA AI Tutor Server Error]", "color: #ff4d4f; font-weight: bold; font-size: 13px;");
+        console.error("Title:", title);
+        console.error("Message:", msg);
+        if (details.status) console.error("HTTP Status:", details.status, details.statusText);
+        if (details.error_type) console.error("Error Type:", details.error_type);
+        if (details.traceback) console.error("Full Traceback:\n" + details.traceback);
+        if (details.rawResponse) console.error("Raw Response:", details.rawResponse);
+        console.groupEnd();
+      } else {
+        currentRawErrorLog = `[${title}] ${msg}`;
+        toggleErrorLogBtn.style.display = "none";
+        copyErrorLogBtn.style.display = "none";
+        errorDetailsContainer.style.display = "none";
+        console.error(`[DSA AI Tutor Error] ${title}: ${msg}`);
+      }
+
       errorToast.style.display = "flex";
-      setTimeout(() => { errorToast.style.display = "none"; }, 8000);
+
+      // If user has technical log, give them 45 seconds or keep open until dismissed
+      const autoDismissDuration = details ? 45000 : 8000;
+      errorToastTimer = setTimeout(() => {
+        errorToast.style.display = "none";
+      }, autoDismissDuration);
     }
-    toastClose.addEventListener("click", () => { errorToast.style.display = "none"; });
+
+    toggleErrorLogBtn.addEventListener("click", () => {
+      const isHidden = errorDetailsContainer.style.display === "none";
+      errorDetailsContainer.style.display = isHidden ? "flex" : "none";
+      toggleErrorLogBtn.textContent = isHidden ? "Hide Error Log" : "View Error Log";
+      if (errorToastTimer) {
+        clearTimeout(errorToastTimer); // Keep open while user is reading the log
+      }
+    });
+
+    copyErrorLogBtn.addEventListener("click", () => {
+      const textToCopy = currentRawErrorLog || `${errorTitle.textContent}: ${errorMsg.textContent}`;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = copyErrorLogBtn.textContent;
+        copyErrorLogBtn.textContent = "✓ Copied!";
+        setTimeout(() => { copyErrorLogBtn.textContent = originalText; }, 2000);
+      }).catch(err => {
+        console.warn("Clipboard write failed:", err);
+      });
+    });
+
+    toastClose.addEventListener("click", () => {
+      if (errorToastTimer) clearTimeout(errorToastTimer);
+      errorToast.style.display = "none";
+    });
 
     // ── Learn button — invoke the DSA agent ────────────────────────
-    function startLearning() {
+    async function startLearning() {
       const topic = topicInput.value.trim();
       if (!topic) {
-        showError("Please enter a DSA topic.");
+        showError("Input Required", "Please enter a DSA topic.");
         topicInput.focus();
         return;
       }
@@ -228,43 +449,100 @@
       loadingTopic.textContent = topic;
       showScreen(loadingScreen);
 
-      fetch("/dsa/invoke/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic: topic }),
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            showError(data.error);
-            showScreen(inputScreen);
-            return;
-          }
-
-          // Populate content
-          resultTopic.textContent = data.topic || topic;
-          theoryContent.innerHTML = marked.parse(data.theory || "");
-          pseudoContent.innerHTML = marked.parse(data.pseudocode || "");
-          codeContent.innerHTML   = marked.parse(data.code || "");
-
-          // Reset tab state
-          tabTheory.classList.add("active");
-          tabPseudo.disabled = true;
-          tabPseudo.classList.add("locked");
-          tabPseudo.querySelector(".lock-icon").style.display = "";
-          tabCode.disabled = true;
-          tabCode.classList.add("locked");
-          tabCode.querySelector(".lock-icon").style.display = "";
-          confirmTheory.style.display = "";
-          confirmPseudo.style.display = "";
-
-          activateTab(tabTheory, panelTheory);
-          showScreen(resultScreen);
-        })
-        .catch(err => {
-          showError("Network error: " + err.message);
-          showScreen(inputScreen);
+      try {
+        const response = await fetch("/dsa/invoke/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic: topic }),
         });
+
+        const contentType = response.headers.get("content-type") || "";
+        let data = null;
+        let rawText = "";
+
+        if (contentType.includes("application/json")) {
+          try {
+            data = await response.json();
+          } catch (jsonErr) {
+            rawText = await response.text().catch(() => "");
+          }
+        } else {
+          rawText = await response.text().catch(() => "");
+        }
+
+        // Handle HTTP error statuses (e.g. 500, 400, 405)
+        if (!response.ok) {
+          const errorType = (data && data.error_type) || `HTTP_${response.status}`;
+          const errorMsgText = (data && data.error) || (data && data.detail) || `Server returned HTTP ${response.status} ${response.statusText}`;
+          const traceback = (data && data.traceback) || null;
+
+          const rawLog = traceback
+            ? `[HTTP ${response.status} ${response.statusText}]\nTopic: ${topic}\nType: ${errorType}\nMessage: ${errorMsgText}\n\nTraceback:\n${traceback}`
+            : (rawText || JSON.stringify(data, null, 2));
+
+          showError(`Internal Server Error (${response.status})`, errorMsgText, {
+            status: response.status,
+            statusText: response.statusText,
+            timestamp: new Date().toLocaleTimeString(),
+            topic: topic,
+            error_type: errorType,
+            traceback: traceback,
+            rawLog: rawLog,
+            rawResponse: data || rawText
+          });
+
+          showScreen(inputScreen);
+          return;
+        }
+
+        // Handle logical error in 200 OK response if any
+        if (data && data.error) {
+          showError("Agent Error", data.error, {
+            status: response.status,
+            error_type: data.error_type || "AgentError",
+            topic: topic,
+            traceback: data.traceback || null,
+            rawLog: data.traceback || data.error,
+            rawResponse: data
+          });
+          showScreen(inputScreen);
+          return;
+        }
+
+        // Populate content on success
+        resultTopic.textContent = data.topic || topic;
+        theoryContent.innerHTML = marked.parse(data.theory || "");
+        pseudoContent.innerHTML = marked.parse(data.pseudocode || "");
+        codeContent.innerHTML   = marked.parse(data.code || "");
+
+        // Reset tab state
+        tabTheory.classList.add("active");
+        tabPseudo.disabled = true;
+        tabPseudo.classList.add("locked");
+        tabPseudo.querySelector(".lock-icon").style.display = "";
+        tabCode.disabled = true;
+        tabCode.classList.add("locked");
+        tabCode.querySelector(".lock-icon").style.display = "";
+        confirmTheory.style.display = "";
+        confirmPseudo.style.display = "";
+
+        activateTab(tabTheory, panelTheory);
+        showScreen(resultScreen);
+
+      } catch (err) {
+        // Network or client-side fetch error
+        console.error("[DSA AI Tutor Network/Client Error]:", err);
+        showError("Network / Client Error", err.message, {
+          status: "ClientException",
+          statusText: err.name,
+          timestamp: new Date().toLocaleTimeString(),
+          topic: topic,
+          error_type: err.name,
+          traceback: err.stack,
+          rawLog: `${err.name}: ${err.message}\n\nStack:\n${err.stack || "N/A"}`
+        });
+        showScreen(inputScreen);
+      }
     }
 
     learnBtn.addEventListener("click", startLearning);

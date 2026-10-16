@@ -16,9 +16,14 @@ from langchain.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, START, END
 
 # ── Load environment variables ──────────────────────────────────────────────
-# Walk up from this file to find the .env at project root
-_env_path = Path(__file__).resolve().parent.parent.parent / ".env"
-load_dotenv(_env_path)
+# Check for .env in pychamp directory or workspace root
+for _env_candidate in [
+    Path(__file__).resolve().parent.parent / ".env",
+    Path(__file__).resolve().parent.parent.parent / ".env",
+]:
+    if _env_candidate.exists():
+        load_dotenv(_env_candidate, override=True)
+        break
 os.environ.setdefault("GROQ_API_KEY", os.getenv("GROQ_API_KEY", ""))
 
 
