@@ -137,6 +137,13 @@
     </div>
     <div class="navbar-right">
       <a href="/" class="btn btn-secondary">← Code Editor</a>
+      {% if request.user.is_authenticated %}
+        <span class="user-chip" title="Logged in as {{ request.user.username }}">
+          <span class="user-chip-icon">👤</span>
+          <span class="user-chip-name">{{ request.user.first_name|default:request.user.username }}</span>
+        </span>
+        <a href="{% url 'logout' %}" class="btn btn-secondary" title="Sign out of PyChamp">Sign Out</a>
+      {% endif %}
     </div>
   </header>
 

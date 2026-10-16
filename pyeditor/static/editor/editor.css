@@ -50,6 +50,30 @@ body {
   gap: 10px;
 }
 
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: #242630;
+  border: 1px solid #363946;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #e2e4ea;
+}
+
+.user-chip-icon {
+  font-size: 0.85rem;
+}
+
+.user-chip-name {
+  font-weight: 500;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;

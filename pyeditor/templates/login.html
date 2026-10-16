@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — PyChamp</title>
+  <link rel="stylesheet" href="{% static 'editor/auth.css' %}?v=1">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      
+      <!-- Brand Header -->
+      <div class="auth-header">
+        <a href="/" class="auth-logo-link" title="PyChamp">
+          <img src="{% static 'editor/logo.png' %}" alt="PyChamp" class="auth-logo">
+          <span class="auth-brand-name">PyChamp</span>
+        </a>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to your account to continue coding and learning.</p>
+      </div>
+
+      <!-- Messages / Alerts -->
+      {% if messages %}
+        <div class="messages-container">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              <span class="alert-icon">
+                {% if message.tags == 'error' or message.tags == 'danger' %}⚠️
+                {% elif message.tags == 'success' %}✓
+                {% else %}ℹ️{% endif %}
+              </span>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Login Form -->
+      <form method="POST" action="{% url 'login' %}" class="auth-form" novalidate>
+        {% csrf_token %}
+        
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
+        <div class="form-group">
+          <label for="usernameInput" class="form-label">
+            Username or Email <span class="required-dot">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="usernameInput"
+              type="text"
+              name="username"
+              class="form-input"
+              placeholder="e.g. alex or alex@example.com"
+              value="{{ username|default:'' }}"
+              required
+              autofocus
+              autocomplete="username"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="passwordInput" class="form-label">
+            Password <span class="required-dot">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="passwordInput"
+              type="password"
+              name="password"
+              class="form-input"
+              placeholder="••••••••••••"
+              required
+              autocomplete="current-password"
+            >
+            <button
+              type="button"
+              id="togglePassword"
+              class="password-toggle-btn"
+              title="Toggle password visibility"
+              aria-label="Toggle password visibility"
+            >
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options-row">
+          <label class="checkbox-label" for="rememberMe">
+            <input type="checkbox" id="rememberMe" name="remember_me" class="custom-checkbox">
+            <span>Remember me for 14 days</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span>Sign In</span>
+          <span>→</span>
+        </button>
+      </form>
+
+      <!-- Switcher to Register -->
+      <div class="auth-footer">
+        Don't have an account?
+        <a href="{% url 'register' %}">Create account</a>
+      </div>
+
+    </div>
+
+    <div class="auth-brand-tagline">
+      PyChamp &bull; Learn, Code, and Master Python &amp; Algorithms
+    </div>
+  </div>
+
+  <script>
+    // Password visibility toggle
+    const toggleBtn = document.getElementById("togglePassword");
+    const passwordInput = document.getElementById("passwordInput");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    if (toggleBtn && passwordInput) {
+      toggleBtn.addEventListener("click", () => {
+        const isPassword = passwordInput.getAttribute("type") === "password";
+        passwordInput.setAttribute("type", isPassword ? "text" : "password");
+        
+        if (isPassword) {
+          // Eye-off icon
+          eyeIcon.innerHTML = `
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          `;
+        } else {
+          // Normal eye icon
+          eyeIcon.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          `;
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import traceback
 from pathlib import Path
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from dotenv import load_dotenv
 
@@ -24,8 +25,9 @@ for _env_candidate in [
         load_dotenv(_env_candidate, override=True)
 
 
+@login_required(login_url="login")
 def dsa_view(request):
-    """Render the DSA learning page."""
+    """Render the DSA learning page (protected)."""
     return render(request, "dsa.html")
 
 
@@ -34,7 +36,11 @@ def dsa_invoke(request):
     """
     POST endpoint that accepts a DSA topic, invokes the LangGraph agent
     pipeline, and returns the theory / pseudocode / code as JSON.
+    Requires an authenticated session.
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Authentication required. Please sign in."}, status=401)
+
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=405)
 
