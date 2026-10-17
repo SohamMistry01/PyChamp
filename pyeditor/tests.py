@@ -188,6 +188,25 @@ class SavedNotesTestCase(TestCase):
         self.assertNotContains(res, "🗑️")
 
 
+class AdminPanelTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.superuser = User.objects.create_superuser(
+            username="adminuser",
+            email="admin@example.com",
+            password="adminpassword123",
+        )
+
+    def test_admin_panel_back_to_pychamp_link(self):
+        self.client.login(username="adminuser", password="adminpassword123")
+        res = self.client.get(reverse("admin:index"))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Back to PyChamp")
+        self.assertContains(res, reverse("home"))
+        self.assertContains(res, "PyChamp Administration")
+
+
+
 
 
 

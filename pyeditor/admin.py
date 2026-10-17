@@ -48,3 +48,8 @@ class UserProfileAdmin(admin.ModelAdmin):
 # Re-register UserAdmin with profile inline
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+
+# Customize Admin Site Branding
+admin.site.site_header = "PyChamp Administration"
+admin.site.site_title = "PyChamp Admin Portal"
+admin.site.index_title = "Welcome to PyChamp Admin Portal"
