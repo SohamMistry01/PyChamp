@@ -60,12 +60,20 @@ def dsa_invoke(request):
 
         logger.info("[DSA INVOKE] Starting agent invocation for topic: '%s'", topic)
 
-        # Pre-check for GROQ_API_KEY to give immediate, explicit error log if missing
-        groq_key = os.getenv("GROQ_API_KEY", "").strip()
-        if not groq_key:
+        # 1. Resolve GROQ_API_KEY with priority:
+        # Priority 1: User's individual key in UserProfile model
+        # Priority 2: Fallback key from .env file / environment variable
+        from pyeditor.models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        user_key = (profile.groq_api_key or "").strip()
+        env_fallback_key = os.getenv("GROQ_API_KEY", "").strip()
+
+        effective_key = user_key or env_fallback_key
+
+        if not effective_key:
             err_msg = (
-                "GROQ_API_KEY is missing or empty. Please ensure GROQ_API_KEY is configured in "
-                "your .env file (e.g., pychamp/.env) or environment variables."
+                "Groq API key is missing. Please configure your individual Groq API key in your "
+                "User Profile (or configure GROQ_API_KEY in your .env file)."
             )
             logger.error("[DSA INVOKE CONFIG ERROR] %s", err_msg)
             print(
@@ -82,10 +90,21 @@ def dsa_invoke(request):
                 "detail": err_msg,
             }, status=500)
 
+        if user_key:
+            logger.info(
+                "[DSA INVOKE] Priority 1: Using custom Groq API key from user profile for user '%s'",
+                request.user.username,
+            )
+        else:
+            logger.info(
+                "[DSA INVOKE] Priority 2: No custom key configured; using fallback .env GROQ_API_KEY for user '%s'",
+                request.user.username,
+            )
+
         # Import here to avoid loading heavy ML libs at Django startup
         from pyeditor.dsa_agent import invoke_dsa_agent
 
-        result = invoke_dsa_agent(topic)
+        result = invoke_dsa_agent(topic, api_key=effective_key, user=request.user)
         logger.info("[DSA INVOKE] Successfully completed agent invocation for topic: '%s'", topic)
 
         return JsonResponse({

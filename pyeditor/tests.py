@@ -245,6 +245,73 @@ class UserProfileGroqApiKeyTestCase(TestCase):
         state_empty = {"topic": "Binary Search", "api_key": "  "}
         self.assertEqual(_get_api_key(state_empty), os.getenv("GROQ_API_KEY", "").strip())
 
+    def test_profile_update_groq_api_key(self):
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        res = client.post(
+            reverse("profile"),
+            {
+                "first_name": "Key",
+                "last_name": "User",
+                "experience_level": "intermediate",
+                "bio": "Studying trees and graphs",
+                "groq_api_key": "gsk_updated_via_profile_123",
+            },
+        )
+        self.assertEqual(res.status_code, 302)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.groq_api_key, "gsk_updated_via_profile_123")
+
+    def test_dsa_invoke_uses_user_key_priority(self):
+        from unittest.mock import patch
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        self.profile.groq_api_key = "gsk_user_priority_999"
+        self.profile.save()
+
+        with patch("pyeditor.dsa_agent.invoke_dsa_agent") as mock_agent:
+            mock_agent.return_value = {
+                "topic": "Linked List",
+                "theory": "Theory content",
+                "pseudocode": "Pseudocode content",
+                "code": "Code content",
+            }
+            res = client.post(
+                reverse("dsa_invoke"),
+                data=json.dumps({"topic": "Linked List"}),
+                content_type="application/json",
+            )
+            self.assertEqual(res.status_code, 200)
+            mock_agent.assert_called_once()
+            _, kwargs = mock_agent.call_args
+            self.assertEqual(kwargs.get("api_key"), "gsk_user_priority_999")
+
+    def test_dsa_invoke_uses_env_fallback_when_user_key_empty(self):
+        from unittest.mock import patch
+        import os
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        self.profile.groq_api_key = ""
+        self.profile.save()
+
+        with patch("pyeditor.dsa_agent.invoke_dsa_agent") as mock_agent:
+            mock_agent.return_value = {
+                "topic": "Linked List",
+                "theory": "Theory content",
+                "pseudocode": "Pseudocode content",
+                "code": "Code content",
+            }
+            res = client.post(
+                reverse("dsa_invoke"),
+                data=json.dumps({"topic": "Linked List"}),
+                content_type="application/json",
+            )
+            self.assertEqual(res.status_code, 200)
+            mock_agent.assert_called_once()
+            _, kwargs = mock_agent.call_args
+            self.assertEqual(kwargs.get("api_key"), os.getenv("GROQ_API_KEY", "").strip())
+
+
 
 
 

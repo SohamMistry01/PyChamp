@@ -173,11 +173,14 @@ def profile_view(request):
         last_name = request.POST.get("last_name", "").strip()
         experience_level = request.POST.get("experience_level", "beginner").strip()
         bio = request.POST.get("bio", "").strip()
+        groq_api_key = request.POST.get("groq_api_key", None)
 
         # Update profile fields
         if experience_level in dict(UserProfile.EXPERIENCE_CHOICES):
             profile.experience_level = experience_level
         profile.bio = bio
+        if groq_api_key is not None:
+            profile.groq_api_key = groq_api_key.strip()
         profile.save()
 
         # Update user names if changed
