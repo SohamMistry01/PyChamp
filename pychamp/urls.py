@@ -16,7 +16,7 @@ from pyeditor.views import (
     saved_note_content,
     delete_saved_note,
 )
-from pyeditor.dsa_views import dsa_view, dsa_invoke, dsa_save_notes
+from pyeditor.dsa_views import dsa_view, dsa_invoke, dsa_save_notes, save_groq_key_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,6 +30,7 @@ urlpatterns = [
     path("dsa/", dsa_view, name="dsa"),
     path("dsa/invoke/", dsa_invoke, name="dsa_invoke"),
     path("dsa/save/", dsa_save_notes, name="dsa_save"),
+    path("dsa/save_api_key/", save_groq_key_view, name="save_groq_key"),
     path("notes/", saved_notes_view, name="saved_notes"),
     path("notes/content/", saved_note_content, name="saved_note_content"),
     path("notes/delete/", delete_saved_note, name="delete_saved_note"),

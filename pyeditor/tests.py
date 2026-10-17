@@ -226,12 +226,23 @@ class UserProfileGroqApiKeyTestCase(TestCase):
         self.profile.save()
         self.assertEqual(self.profile.get_groq_api_key(), "gsk_custom_user_key_123")
 
-    def test_get_groq_api_key_fallback(self):
-        import os
+    def test_get_groq_api_key_regular_user_strict(self):
+        # Regular user should NOT get .env fallback
         self.profile.groq_api_key = ""
         self.profile.save()
-        env_key = os.getenv("GROQ_API_KEY", "")
-        self.assertEqual(self.profile.get_groq_api_key(), env_key.strip())
+        self.assertEqual(self.profile.get_groq_api_key(), "")
+        self.assertFalse(self.profile.has_groq_access())
+
+    def test_get_groq_api_key_superuser_fallback(self):
+        import os
+        # Superuser IS allowed fallback to .env
+        self.user.is_superuser = True
+        self.user.save()
+        self.profile.groq_api_key = ""
+        self.profile.save()
+        env_key = os.getenv("GROQ_API_KEY", "").strip()
+        self.assertEqual(self.profile.get_groq_api_key(), env_key)
+        self.assertEqual(self.profile.has_groq_access(), bool(env_key))
 
     def test_dsa_agent_key_resolution(self):
         import os
@@ -261,6 +272,7 @@ class UserProfileGroqApiKeyTestCase(TestCase):
         self.assertEqual(res.status_code, 302)
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.groq_api_key, "gsk_updated_via_profile_123")
+        self.assertTrue(self.profile.has_groq_access())
 
     def test_dsa_invoke_uses_user_key_priority(self):
         from unittest.mock import patch
@@ -286,10 +298,30 @@ class UserProfileGroqApiKeyTestCase(TestCase):
             _, kwargs = mock_agent.call_args
             self.assertEqual(kwargs.get("api_key"), "gsk_user_priority_999")
 
-    def test_dsa_invoke_uses_env_fallback_when_user_key_empty(self):
+    def test_dsa_invoke_blocked_for_regular_user_without_key(self):
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        self.profile.groq_api_key = ""
+        self.profile.save()
+
+        res = client.post(
+            reverse("dsa_invoke"),
+            data=json.dumps({"topic": "Linked List"}),
+            content_type="application/json",
+        )
+        # Must return HTTP 403 Forbidden with needs_key=True
+        self.assertEqual(res.status_code, 403)
+        data = res.json()
+        self.assertTrue(data.get("needs_key"))
+        self.assertEqual(data.get("error_type"), "ApiKeyRequiredError")
+
+    def test_dsa_invoke_superuser_env_fallback(self):
         from unittest.mock import patch
         import os
         client = Client()
+        # Make user a superuser
+        self.user.is_superuser = True
+        self.user.save()
         client.login(username="keyuser", password="password123")
         self.profile.groq_api_key = ""
         self.profile.save()
@@ -310,6 +342,71 @@ class UserProfileGroqApiKeyTestCase(TestCase):
             mock_agent.assert_called_once()
             _, kwargs = mock_agent.call_args
             self.assertEqual(kwargs.get("api_key"), os.getenv("GROQ_API_KEY", "").strip())
+
+    def test_save_groq_key_view_success(self):
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        res = client.post(
+            reverse("save_groq_key"),
+            data=json.dumps({"api_key": "gsk_valid_test_api_key_abcdef123456"}),
+            content_type="application/json",
+        )
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertTrue(data["success"])
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.groq_api_key, "gsk_valid_test_api_key_abcdef123456")
+        self.assertTrue(self.profile.has_groq_access())
+
+    def test_save_groq_key_view_invalid_format(self):
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        # Key missing gsk_ prefix
+        res = client.post(
+            reverse("save_groq_key"),
+            data=json.dumps({"api_key": "invalid_key_123"}),
+            content_type="application/json",
+        )
+        self.assertEqual(res.status_code, 400)
+        data = res.json()
+        self.assertIn("error", data)
+
+        # Empty key
+        res_empty = client.post(
+            reverse("save_groq_key"),
+            data=json.dumps({"api_key": "   "}),
+            content_type="application/json",
+        )
+        self.assertEqual(res_empty.status_code, 400)
+
+    def test_home_and_dsa_badge_rendering(self):
+        client = Client()
+        client.login(username="keyuser", password="password123")
+        self.profile.groq_api_key = ""
+        self.profile.save()
+
+        # Regular user without key -> red warning badge on home
+        home_res = client.get(reverse("home"))
+        self.assertEqual(home_res.status_code, 200)
+        self.assertContains(home_res, "status-pulse-red")
+        self.assertContains(home_res, "Agent Environment Not Set")
+        self.assertContains(home_res, "openGroqModal()")
+
+        # DSA page -> locked Learn button and warning banner
+        dsa_res = client.get(reverse("dsa"))
+        self.assertEqual(dsa_res.status_code, 200)
+        self.assertContains(dsa_res, "btn-locked")
+        self.assertContains(dsa_res, "Personal Groq API Key Required")
+
+        # Now configure key
+        self.profile.groq_api_key = "gsk_configured_valid_key_123456"
+        self.profile.save()
+
+        # Home page -> green ready badge
+        home_res_ready = client.get(reverse("home"))
+        self.assertContains(home_res_ready, "status-pulse-green")
+        self.assertContains(home_res_ready, "Agent Environment Ready")
+
 
 
 

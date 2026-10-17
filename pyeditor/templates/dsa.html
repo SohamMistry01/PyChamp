@@ -166,6 +166,99 @@
       color: #ffffff;
       box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
     }
+
+    /* ── Locked Learn Button & API Key Setup Banner ── */
+    .btn-locked {
+      background: #232635 !important;
+      color: #9499ab !important;
+      border: 1px solid #383d52 !important;
+      cursor: pointer !important;
+      opacity: 0.95;
+      box-shadow: none !important;
+      transition: all 0.2s ease;
+    }
+    .btn-locked:hover {
+      background: #2b2f42 !important;
+      color: #fca5a5 !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.3) !important;
+    }
+    .btn-api-key-nav {
+      background: rgba(56, 189, 248, 0.1);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-api-key-nav:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+    .api-key-banner {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 auto 20px;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: left;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .api-key-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .api-key-banner-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .api-key-banner-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fca5a5;
+      margin-bottom: 3px;
+    }
+    .api-key-banner-desc {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+    .btn-warning-setup {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    }
+    .btn-warning-setup:hover {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -200,6 +293,12 @@
         </svg>
         <span>Code Editor</span>
       </a>
+      <button type="button" class="btn btn-api-key-nav" onclick="openGroqModal()" title="Configure your personal Groq API Key">
+        <svg class="icon icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+        </svg>
+        <span>API Key</span>
+      </button>
       {% if request.user.is_authenticated %}
         {% if request.user.is_superuser %}
           <a href="{% url 'admin:index' %}" class="btn btn-admin" title="Open Django Admin Panel">
@@ -238,6 +337,24 @@
         generate a complete learning package — Theory, Pseudocode, and Python Code —
         just for you.
       </p>
+
+      <!-- API Key Setup Banner if user has not configured personal key -->
+      <div id="apiKeyBanner" class="api-key-banner" style="{% if has_api_key %}display: none;{% endif %}">
+        <div class="api-key-banner-content">
+          <span class="api-key-banner-icon">⚠️</span>
+          <div>
+            <div class="api-key-banner-title">Personal Groq API Key Required</div>
+            <div class="api-key-banner-desc">You need to configure your free individual Groq API key to unlock and run the AI DSA Tutor. Open-source models on Groq are free with zero token cost.</div>
+          </div>
+        </div>
+        <button type="button" class="btn-warning-setup" onclick="openGroqModal()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+          </svg>
+          <span>Set Up API Key</span>
+        </button>
+      </div>
+
       <div class="input-row">
         <input
           id="topicInput"
@@ -247,8 +364,17 @@
           autocomplete="off"
           spellcheck="false"
         >
-        <button id="learnBtn" class="btn btn-primary btn-lg" type="button">
-          <span>✦</span> Learn
+        <button
+          id="learnBtn"
+          class="btn btn-primary btn-lg {% if not has_api_key %}btn-locked{% endif %}"
+          type="button"
+          title="{% if not has_api_key %}Personal Groq API key required. Click to set up key.{% else %}Generate lesson with AI{% endif %}"
+        >
+          {% if not has_api_key %}
+            <span>🔒</span> Locked
+          {% else %}
+            <span>✦</span> Learn
+          {% endif %}
         </button>
       </div>
     </div>
@@ -383,6 +509,7 @@
     const topicInput    = document.getElementById("topicInput");
     const learnBtn      = document.getElementById("learnBtn");
     const loadingTopic  = document.getElementById("loadingTopic");
+    let userHasApiKey   = {{ has_api_key|yesno:"true,false" }};
     const resultTopic   = document.getElementById("resultTopic");
     const newTopicBtn   = document.getElementById("newTopicBtn");
 
@@ -566,6 +693,12 @@
 
     // ── Learn button — invoke the DSA agent ────────────────────────
     async function startLearning() {
+      // Strictly enforce personal API key check
+      if (!userHasApiKey) {
+        openGroqModal();
+        return;
+      }
+
       const topic = topicInput.value.trim();
       if (!topic) {
         showError("Input Required", "Please enter a DSA topic.");
@@ -598,8 +731,17 @@
           rawText = await response.text().catch(() => "");
         }
 
-        // Handle HTTP error statuses (e.g. 500, 400, 405)
+        // Handle HTTP error statuses (e.g. 500, 403, 400, 405)
         if (!response.ok) {
+          // Check for API key requirement block
+          if (response.status === 403 && data && data.needs_key) {
+            updateLockState(false);
+            openGroqModal();
+            showError("API Key Required", data.error || "Please configure your personal Groq API key to access AI DSA Tutor.");
+            showScreen(inputScreen);
+            return;
+          }
+
           const errorType = (data && data.error_type) || `HTTP_${response.status}`;
           const errorMsgText = (data && data.error) || (data && data.detail) || `Server returned HTTP ${response.status} ${response.statusText}`;
           const traceback = (data && data.traceback) || null;
@@ -745,6 +887,31 @@
       if (e.key === "Enter") startLearning();
     });
 
+    // ── Update Lock State for Learn Button & Banner ────────────────
+    function updateLockState(hasKey) {
+      userHasApiKey = Boolean(hasKey);
+      if (learnBtn) {
+        if (userHasApiKey) {
+          learnBtn.classList.remove("btn-locked");
+          learnBtn.innerHTML = "<span>✦</span> Learn";
+          learnBtn.title = "Generate lesson with AI";
+        } else {
+          learnBtn.classList.add("btn-locked");
+          learnBtn.innerHTML = "<span>🔒</span> Locked";
+          learnBtn.title = "Personal Groq API key required. Click to set up key.";
+        }
+      }
+      const banner = document.getElementById("apiKeyBanner");
+      if (banner) {
+        banner.style.display = userHasApiKey ? "none" : "flex";
+      }
+    }
+
+    // Listen for groqKeySaved event from groq_modal
+    window.addEventListener("groqKeySaved", (e) => {
+      updateLockState(true);
+    });
+
     // ── New topic button ───────────────────────────────────────────
     newTopicBtn.addEventListener("click", () => {
       topicInput.value = "";
@@ -752,5 +919,9 @@
       topicInput.focus();
     });
   </script>
+
+  <!-- ── Groq API Key Setup Modal ── -->
+  {% include 'groq_modal.html' %}
+
 </body>
 </html>

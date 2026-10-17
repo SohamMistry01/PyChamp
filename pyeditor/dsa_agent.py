@@ -138,16 +138,19 @@ def invoke_dsa_agent(topic: str, api_key: str | None = None, user=None) -> dict:
     effective_key = (api_key or "").strip()
     if not effective_key and user is not None:
         profile = getattr(user, "profile", user)
-        if hasattr(profile, "groq_api_key"):
+        if hasattr(profile, "get_groq_api_key"):
+            effective_key = profile.get_groq_api_key()
+        elif hasattr(profile, "groq_api_key"):
             effective_key = (profile.groq_api_key or "").strip()
 
-    if not effective_key:
+    # For standalone scripts/calls where no user is specified, allow .env fallback
+    if not effective_key and user is None:
         effective_key = os.getenv("GROQ_API_KEY", "").strip()
 
-    payload = {"topic": topic}
-    if effective_key:
-        payload["api_key"] = effective_key
+    if not effective_key:
+        raise ValueError("A valid Groq API key is required to invoke the DSA agent.")
 
+    payload = {"topic": topic, "api_key": effective_key}
     result = graph.invoke(payload)
     return result
 

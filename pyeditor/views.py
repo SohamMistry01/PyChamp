@@ -208,12 +208,14 @@ def home_view(request):
     """
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     saved_notes_count = len(profile.saved_notes or [])
+    has_api_key = profile.has_groq_access()
     return render(
         request,
         "home.html",
         {
             "profile": profile,
             "saved_notes_count": saved_notes_count,
+            "has_api_key": has_api_key,
         },
     )
 

@@ -285,14 +285,49 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulseDotGreen 2s infinite ease-in-out;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.status-pulse-green,
+.workspace-status-badge .status-pulse-green {
+  background-color: #10b981 !important;
+  box-shadow: 0 0 8px #10b981 !important;
+  animation: pulseDotGreen 2s infinite ease-in-out !important;
+}
+
+.status-pulse-red,
+.workspace-status-badge .status-pulse-red {
+  background-color: #ef4444 !important;
+  box-shadow: 0 0 8px #ef4444 !important;
+  animation: pulseDotRed 2s infinite ease-in-out !important;
 }
 
 @keyframes pulseDotGreen {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
+}
+
+@keyframes pulseDotRed {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+.status-badge-warning,
+.workspace-status-badge.status-badge-warning {
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  color: #fca5a5 !important;
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+.status-badge-warning:hover,
+.workspace-status-badge.status-badge-warning:hover {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important;
 }
 
 @media (max-width: 680px) {

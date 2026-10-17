@@ -5,7 +5,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PyChamp - Python Learning &amp; Coding Suite</title>
-  <link rel="stylesheet" href="{% static 'editor/home.css' %}?v=2">
+  <link rel="stylesheet" href="{% static 'editor/home.css' %}?v=3">
+  <style>
+    /* Critical status badge styles (bypasses browser CSS cache) */
+    .status-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .status-pulse-green,
+    .workspace-status-badge .status-pulse-green {
+      background-color: #10b981 !important;
+      box-shadow: 0 0 8px #10b981 !important;
+      animation: pulseDotGreen 2s infinite ease-in-out !important;
+    }
+    .status-pulse-red,
+    .workspace-status-badge .status-pulse-red {
+      background-color: #ef4444 !important;
+      box-shadow: 0 0 8px #ef4444 !important;
+      animation: pulseDotRed 2s infinite ease-in-out !important;
+    }
+    @keyframes pulseDotGreen {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+    @keyframes pulseDotRed {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+    .status-badge-warning,
+    .workspace-status-badge.status-badge-warning {
+      border-color: rgba(239, 68, 68, 0.45) !important;
+      color: #fca5a5 !important;
+      background-color: rgba(239, 68, 68, 0.08) !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease;
+    }
+    .status-badge-warning:hover,
+    .workspace-status-badge.status-badge-warning:hover {
+      background-color: rgba(239, 68, 68, 0.18) !important;
+      border-color: #ef4444 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -61,7 +106,7 @@
       </div>
       <h2 class="intro-heading">Next-Gen Python &amp; Algorithms Learning Suite</h2>
       <p class="intro-description">
-        <strong>PyChamp</strong> is an intelligent developer ecosystem engineered to accelerate your Python mastery and algorithmic problem-solving. It unifies a live server-side Python code editor, a concurrent multi-agent AI DSA tutor powered by LangGraph and Groq, and a local personal study archive. Whether you are running isolated scripts, breaking down complex data structures from intuition to implementation, or revisiting offline notes with zero token overhead, PyChamp provides a focused, modern workspace for every step of your programming journey.
+        <strong>PyChamp</strong> is an intelligent developer ecosystem engineered to accelerate your Python mastery and algorithmic problem-solving. It unifies a live server-side Python code editor, a concurrent multi-agent AI DSA tutor and a local personal study archive. Whether you are running isolated scripts, breaking down complex data structures from intuition to implementation, or revisiting offline notes with zero token overhead, PyChamp provides a focused, modern workspace for every step of your programming journey.
       </p>
     </section>
 
@@ -73,10 +118,17 @@
           Select a tool below to practice Python code, master algorithmic patterns with AI, or review saved notes.
         </p>
       </div>
-      <div class="workspace-status-badge">
-        <span class="status-pulse-dot"></span>
-        <span>Agent Environment Ready</span>
-      </div>
+      {% if has_api_key %}
+        <div class="workspace-status-badge" id="workspaceStatusBadge" title="AI Agent environment is fully configured and ready">
+          <span class="status-pulse-dot status-pulse-green" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span id="workspaceStatusText">Agent Environment Ready</span>
+        </div>
+      {% else %}
+        <div class="workspace-status-badge status-badge-warning" id="workspaceStatusBadge" onclick="openGroqModal()" style="cursor: pointer; border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; background-color: rgba(239, 68, 68, 0.08);" title="Agent environment not configured. Click to set up your personal Groq API key">
+          <span class="status-pulse-dot status-pulse-red" style="background-color: #ef4444; box-shadow: 0 0 8px #ef4444;"></span>
+          <span id="workspaceStatusText">Agent Environment Not Set</span>
+        </div>
+      {% endif %}
     </section>
 
     <!-- Feedback Messages -->
@@ -282,6 +334,28 @@
     PyChamp &bull; Next-Gen Python Coding &amp; AI Algorithms Learning Environment
   </footer>
 
+  <!-- ── Groq API Key Setup Modal ── -->
+  {% include 'groq_modal.html' %}
+
+  <script>
+    // Listen for successful Groq API key save and update environment status badge
+    window.addEventListener('groqKeySaved', function(e) {
+      const badge = document.getElementById('workspaceStatusBadge');
+      if (badge) {
+        badge.className = 'workspace-status-badge';
+        badge.style.cursor = 'default';
+        badge.style.borderColor = '';
+        badge.style.color = '';
+        badge.style.backgroundColor = '';
+        badge.title = 'AI Agent environment is fully configured and ready';
+        badge.onclick = null;
+        badge.innerHTML = `
+          <span class="status-pulse-dot status-pulse-green" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span id="workspaceStatusText">Agent Environment Ready</span>
+        `;
+      }
+    });
+  </script>
 </body>
 </html>
 

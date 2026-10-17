@@ -62,13 +62,32 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} ({self.get_experience_level_display()})"
 
-    def get_groq_api_key(self) -> str:
+    def has_groq_access(self) -> bool:
         """
-        Return the user's custom Groq API key if configured;
-        otherwise fall back to the platform default from environment / .env.
+        Check if user is authorized to access the AI DSA Tutor.
+        Regular users MUST configure their own personal key in their profile.
+        Superusers can use their personal key or fall back to the platform .env key.
         """
         import os
-        return (self.groq_api_key or "").strip() or os.getenv("GROQ_API_KEY", "").strip()
+        if self.groq_api_key and self.groq_api_key.strip():
+            return True
+        if self.user.is_superuser and os.getenv("GROQ_API_KEY", "").strip():
+            return True
+        return False
+
+    def get_groq_api_key(self) -> str:
+        """
+        Return effective Groq API key:
+        - Regular users: strictly their custom key in profile (no .env fallback).
+        - Superusers: their custom key in profile, or .env fallback if profile key is blank.
+        """
+        import os
+        user_key = (self.groq_api_key or "").strip()
+        if user_key:
+            return user_key
+        if self.user.is_superuser:
+            return os.getenv("GROQ_API_KEY", "").strip()
+        return ""
 
     @property
     def saved_files(self):

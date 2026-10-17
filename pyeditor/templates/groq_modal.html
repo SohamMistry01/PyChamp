@@ -1,0 +1,611 @@
+<!-- ── Groq API Key Setup Modal ─────────────────────────────────────────── -->
+<div id="groqApiKeyModal" class="groq-modal-overlay" style="display: none;" aria-hidden="true" role="dialog" aria-labelledby="groqModalTitle">
+  <div class="groq-modal-backdrop" onclick="closeGroqModal()"></div>
+  <div class="groq-modal-dialog">
+    
+    <!-- Modal Header -->
+    <div class="groq-modal-header">
+      <div class="groq-modal-title-wrap">
+        <div class="groq-modal-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 id="groqModalTitle" class="groq-modal-title">Configure Groq API Key</h3>
+          <p class="groq-modal-subtitle">Set up your free individual API key to unlock the AI DSA Tutor</p>
+        </div>
+      </div>
+      <button type="button" class="groq-modal-close-btn" onclick="closeGroqModal()" title="Close dialog" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="groq-modal-body">
+
+      <!-- Step-by-Step Guide -->
+      <div class="groq-instructions-box">
+        <h4 class="groq-instructions-heading">Step-by-step Setup Instructions:</h4>
+        <ol class="groq-steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div class="step-content">
+              Visit <a href="https://console.groq.com/home" target="_blank" rel="noopener noreferrer" class="groq-link">console.groq.com/home</a> and sign in with your Google or GitHub account (or create a new account).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div class="step-content">
+              Click on <strong>"API Keys"</strong> in the top navigation bar, or go directly to <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" class="groq-link">console.groq.com/keys</a>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div class="step-content">
+              Click the <strong>"+ Create API Key"</strong> button. Enter a Display Name of your choice (e.g. <em>PyChamp-DSA</em>) and select your preferred expiration timeline. Complete any identity verification and click <strong>Submit</strong>.
+              <span class="step-hint">Note: You can revisit the Groq Console at any time when your key expires to generate a fresh one.</span>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <div class="step-content">
+              Your API Key will be revealed once. Copy it to your clipboard immediately and paste it into the field below.
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <!-- Zero-Cost & Rate Limits Disclaimer -->
+      <div class="groq-disclaimer-box">
+        <div class="disclaimer-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <strong>Free Tier &amp; Rate Limits Disclaimer</strong>
+        </div>
+        <p class="disclaimer-text">
+          PyChamp runs open-source models on Groq's <strong>free tier</strong>, which provides <strong>zero token cost</strong> to you. However, to avoid encountering temporary rate-limit errors, please use the AI DSA Tutor within moderate request frequencies. To learn more about usage quotas, review the <a href="https://console.groq.com/docs/rate-limits" target="_blank" rel="noopener noreferrer" class="groq-link">Groq Rate Limits documentation</a>.
+        </p>
+      </div>
+
+      <!-- Key Input Area -->
+      <div class="groq-input-group">
+        <label for="groqModalKeyInput" class="groq-input-label">Paste Your Groq API Key:</label>
+        <div class="groq-input-wrapper">
+          <input
+            type="password"
+            id="groqModalKeyInput"
+            class="groq-key-input"
+            placeholder="gsk_..."
+            autocomplete="off"
+            spellcheck="false"
+            value="{% if profile.groq_api_key %}{{ profile.groq_api_key }}{% endif %}"
+          >
+          <button type="button" id="groqToggleKeyVisibility" class="groq-eye-btn" title="Toggle visibility" aria-label="Toggle password visibility">
+            <svg id="eyeShowSvg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg id="eyeHideSvg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <span class="groq-input-hint">Your API key is stored securely in your individual user profile and is only used to execute your AI agent queries.</span>
+      </div>
+
+      <!-- Feedback Banner (Error / Success) -->
+      <div id="groqModalFeedback" class="groq-feedback-banner" style="display: none;"></div>
+
+    </div>
+
+    <!-- Modal Footer Actions -->
+    <div class="groq-modal-footer">
+      <button type="button" class="btn-modal-cancel" onclick="closeGroqModal()">Cancel</button>
+      <button type="button" id="groqModalSaveBtn" class="btn-modal-save" onclick="submitGroqKey()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span id="groqSaveBtnText">Save &amp; Unlock AI Tutor</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* ── Groq Modal Styles ─────────────────────────────────────────────────── */
+  .groq-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .groq-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 11, 15, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: groqFadeIn 0.2s ease-out;
+  }
+
+  .groq-modal-dialog {
+    position: relative;
+    background: #16171f;
+    border: 1px solid #2a2e40;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(56, 189, 248, 0.15);
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10000;
+    animation: groqScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes groqFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes groqScaleIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .groq-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #222533;
+    background: #1a1c26;
+    flex-shrink: 0;
+  }
+
+  .groq-modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .groq-modal-icon-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .groq-modal-title {
+    margin: 0;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.2px;
+  }
+
+  .groq-modal-subtitle {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    color: #8b92a7;
+  }
+
+  .groq-modal-close-btn {
+    background: transparent;
+    border: none;
+    color: #7b8196;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+
+  .groq-modal-close-btn:hover {
+    background: #252838;
+    color: #ffffff;
+  }
+
+  .groq-modal-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #35394d #16171f;
+  }
+
+  .groq-instructions-box {
+    background: #1a1c27;
+    border: 1px solid #262a3b;
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .groq-instructions-heading {
+    margin: 0 0 12px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+
+  .groq-steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .groq-steps-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.84rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(56, 189, 248, 0.18);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+    font-size: 0.74rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.76rem;
+    color: #7b839b;
+  }
+
+  .groq-link {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px dashed rgba(56, 189, 248, 0.4);
+    transition: color 0.15s;
+  }
+
+  .groq-link:hover {
+    color: #7dd3fc;
+    border-bottom-style: solid;
+  }
+
+  .groq-disclaimer-box {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .disclaimer-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fbbf24;
+    margin-bottom: 6px;
+  }
+
+  .disclaimer-text {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #d1d5db;
+    line-height: 1.5;
+  }
+
+  .groq-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .groq-input-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .groq-input-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .groq-key-input {
+    width: 100%;
+    padding: 10px 42px 10px 14px;
+    background: #111218;
+    border: 1px solid #2d3246;
+    border-radius: 7px;
+    color: #f8fafc;
+    font-family: Consolas, "Fira Code", monospace;
+    font-size: 0.86rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .groq-key-input:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+  }
+
+  .groq-eye-btn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
+  }
+
+  .groq-eye-btn:hover {
+    color: #cbd5e1;
+  }
+
+  .groq-input-hint {
+    font-size: 0.74rem;
+    color: #64748b;
+  }
+
+  .groq-feedback-banner {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.45;
+    animation: groqFadeIn 0.2s;
+  }
+
+  .groq-feedback-banner.success {
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #86efac;
+  }
+
+  .groq-feedback-banner.error {
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+  }
+
+  .groq-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-top: 1px solid #222533;
+    background: #1a1c26;
+    flex-shrink: 0;
+  }
+
+  .btn-modal-cancel {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid #33384c;
+    border-radius: 6px;
+    color: #94a3b8;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-modal-cancel:hover {
+    background: #252838;
+    color: #ffffff;
+  }
+
+  .btn-modal-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: #0284c7;
+    border: 1px solid #0369a1;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-modal-save:hover:not(:disabled) {
+    background: #0369a1;
+    border-color: #0284c7;
+    transform: translateY(-1px);
+  }
+
+  .btn-modal-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>
+
+<script>
+  // ── Global Groq Modal Controller ──────────────────────────────────────────
+  function openGroqModal() {
+    const modal = document.getElementById("groqApiKeyModal");
+    const input = document.getElementById("groqModalKeyInput");
+    const feedback = document.getElementById("groqModalFeedback");
+    if (!modal) return;
+    
+    if (feedback) feedback.style.display = "none";
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    if (input) {
+      setTimeout(() => input.focus(), 100);
+    }
+  }
+
+  function closeGroqModal() {
+    const modal = document.getElementById("groqApiKeyModal");
+    if (!modal) return;
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("groqApiKeyModal");
+      if (modal && modal.style.display !== "none") {
+        closeGroqModal();
+      }
+    }
+  });
+
+  // Toggle key visibility
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("groqToggleKeyVisibility");
+    const input = document.getElementById("groqModalKeyInput");
+    const showSvg = document.getElementById("eyeShowSvg");
+    const hideSvg = document.getElementById("eyeHideSvg");
+
+    if (toggleBtn && input && showSvg && hideSvg) {
+      toggleBtn.addEventListener("click", () => {
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+        showSvg.style.display = isPassword ? "none" : "";
+        hideSvg.style.display = isPassword ? "" : "none";
+      });
+    }
+
+    if (input) {
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submitGroqKey();
+        }
+      });
+    }
+  });
+
+  // Submit API key to server
+  async function submitGroqKey() {
+    const input = document.getElementById("groqModalKeyInput");
+    const saveBtn = document.getElementById("groqModalSaveBtn");
+    const saveBtnText = document.getElementById("groqSaveBtnText");
+    const feedback = document.getElementById("groqModalFeedback");
+
+    if (!input || !saveBtn) return;
+    const keyVal = input.value.trim();
+
+    if (!keyVal) {
+      showModalFeedback("Please enter or paste your Groq API key.", "error");
+      input.focus();
+      return;
+    }
+
+    if (!keyVal.startsWith("gsk_") || keyVal.length < 15) {
+      showModalFeedback("Invalid key format. Groq API keys typically begin with 'gsk_'.", "error");
+      input.focus();
+      return;
+    }
+
+    saveBtn.disabled = true;
+    if (saveBtnText) saveBtnText.textContent = "Saving…";
+
+    try {
+      const response = await fetch("{% url 'save_groq_key' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: JSON.stringify({ api_key: keyVal }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        showModalFeedback("✓ " + data.message, "success");
+
+        // Dispatch global event so home page and DSA page can update immediately
+        window.dispatchEvent(new CustomEvent("groqKeySaved", {
+          detail: {
+            apiKey: keyVal,
+            maskedKey: data.masked_key || "gsk_****",
+          }
+        }));
+
+        setTimeout(() => {
+          closeGroqModal();
+        }, 1200);
+      } else {
+        showModalFeedback(data.error || "Failed to save key. Please try again.", "error");
+      }
+    } catch (err) {
+      console.error("Save Groq Key Error:", err);
+      showModalFeedback("Network error while saving API key. Please check your connection.", "error");
+    } finally {
+      saveBtn.disabled = false;
+      if (saveBtnText) saveBtnText.textContent = "Save & Unlock AI Tutor";
+    }
+  }
+
+  function showModalFeedback(msg, type) {
+    const feedback = document.getElementById("groqModalFeedback");
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.className = `groq-feedback-banner ${type}`;
+    feedback.style.display = "block";
+  }
+</script>
