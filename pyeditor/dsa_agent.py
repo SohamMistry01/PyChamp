@@ -28,11 +28,20 @@ os.environ.setdefault("GROQ_API_KEY", os.getenv("GROQ_API_KEY", ""))
 
 
 # ── State schema ────────────────────────────────────────────────────────────
-class State(TypedDict):
+class State(TypedDict, total=False):
     topic: str
     theory: str
     pseudocode: str
     code: str
+    api_key: str
+
+
+def _get_api_key(state: State) -> str:
+    """Return user-provided API key from state or fallback to default from environment."""
+    key = (state.get("api_key") or "").strip()
+    if not key:
+        key = os.getenv("GROQ_API_KEY", "").strip()
+    return key
 
 
 # ── Agent node functions ────────────────────────────────────────────────────
@@ -49,7 +58,8 @@ def produce_theory(state: State):
         Generate your response in a structured Markdown format.
         """
     )
-    llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0.2)
+    api_key = _get_api_key(state)
+    llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0.2, groq_api_key=api_key or None)
     chain = prompt | llm | StrOutputParser()
     theory = chain.invoke({"topic": state["topic"]})
     return {"theory": theory}
@@ -66,7 +76,8 @@ def produce_pseudocode(state: State):
         Generate your response in a structured Markdown format and only include Pseudocode.
         """
     )
-    llm = ChatGroq(model="qwen/qwen3.8-27b", temperature=0.2)
+    api_key = _get_api_key(state)
+    llm = ChatGroq(model="qwen/qwen3.8-27b", temperature=0.2, groq_api_key=api_key or None)
     chain = prompt | llm | StrOutputParser()
     pseudocode = chain.invoke({"topic": state["topic"]})
     return {"pseudocode": pseudocode}
@@ -84,7 +95,8 @@ def produce_code(state: State):
         Generate your response in a structured Markdown format.
         """
     )
-    llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2)
+    api_key = _get_api_key(state)
+    llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2, groq_api_key=api_key or None)
     chain = prompt | llm | StrOutputParser()
     code = chain.invoke({"topic": state["topic"]})
     return {"code": code}
@@ -109,11 +121,33 @@ def _build_graph():
 graph = _build_graph()
 
 
-def invoke_dsa_agent(topic: str) -> dict:
+def invoke_dsa_agent(topic: str, api_key: str | None = None, user=None) -> dict:
     """
     Run the DSA agent pipeline for the given topic.
 
+    Parameters:
+    - topic: DSA topic to generate content for.
+    - api_key: Optional custom Groq API key (e.g. from user profile).
+    - user: Optional Django User or UserProfile instance to extract the key from.
+
+    If no custom API key is present or provided, the default GROQ_API_KEY
+    from the .env file / environment is used.
+
     Returns a dict with keys: topic, theory, pseudocode, code.
     """
-    result = graph.invoke({"topic": topic})
+    effective_key = (api_key or "").strip()
+    if not effective_key and user is not None:
+        profile = getattr(user, "profile", user)
+        if hasattr(profile, "groq_api_key"):
+            effective_key = (profile.groq_api_key or "").strip()
+
+    if not effective_key:
+        effective_key = os.getenv("GROQ_API_KEY", "").strip()
+
+    payload = {"topic": topic}
+    if effective_key:
+        payload["api_key"] = effective_key
+
+    result = graph.invoke(payload)
     return result
+

@@ -41,6 +41,12 @@ class UserProfile(models.Model):
         default="beginner",
         help_text="User's Python / programming experience level"
     )
+    groq_api_key = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Custom Groq API Key for DSA AI Tutor. If empty, platform default from .env is used."
+    )
     saved_notes = models.JSONField(
         default=list,
         blank=True,
@@ -55,6 +61,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ({self.get_experience_level_display()})"
+
+    def get_groq_api_key(self) -> str:
+        """
+        Return the user's custom Groq API key if configured;
+        otherwise fall back to the platform default from environment / .env.
+        """
+        import os
+        return (self.groq_api_key or "").strip() or os.getenv("GROQ_API_KEY", "").strip()
 
     @property
     def saved_files(self):

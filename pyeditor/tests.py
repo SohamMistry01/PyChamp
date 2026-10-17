@@ -206,6 +206,47 @@ class AdminPanelTestCase(TestCase):
         self.assertContains(res, "PyChamp Administration")
 
 
+class UserProfileGroqApiKeyTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="keyuser",
+            email="keyuser@example.com",
+            password="password123",
+        )
+        self.profile = UserProfile.objects.create(
+            user=self.user,
+            experience_level="beginner",
+        )
+
+    def test_groq_api_key_default_empty(self):
+        self.assertEqual(self.profile.groq_api_key, "")
+
+    def test_get_groq_api_key_custom(self):
+        self.profile.groq_api_key = "gsk_custom_user_key_123"
+        self.profile.save()
+        self.assertEqual(self.profile.get_groq_api_key(), "gsk_custom_user_key_123")
+
+    def test_get_groq_api_key_fallback(self):
+        import os
+        self.profile.groq_api_key = ""
+        self.profile.save()
+        env_key = os.getenv("GROQ_API_KEY", "")
+        self.assertEqual(self.profile.get_groq_api_key(), env_key.strip())
+
+    def test_dsa_agent_key_resolution(self):
+        import os
+        from pyeditor.dsa_agent import _get_api_key
+
+        # When state has custom api_key
+        state_custom = {"topic": "Binary Search", "api_key": "gsk_test_override"}
+        self.assertEqual(_get_api_key(state_custom), "gsk_test_override")
+
+        # When state has empty api_key, should fallback to env
+        state_empty = {"topic": "Binary Search", "api_key": "  "}
+        self.assertEqual(_get_api_key(state_empty), os.getenv("GROQ_API_KEY", "").strip())
+
+
+
 
 
 
