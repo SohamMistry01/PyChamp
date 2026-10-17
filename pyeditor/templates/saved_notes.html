@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saved DSA Notes — PyChamp</title>
-  <link rel="stylesheet" href="{% static 'editor/saved_notes.css' %}?v=1">
+  <link rel="stylesheet" href="{% static 'editor/saved_notes.css' %}?v=3">
   <!-- Marked.js for real-time Markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
@@ -87,6 +87,68 @@
       border-color: #ef4444;
       color: #ffffff;
       box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
+
+    /* ── Sidebar Scrolling & Accordion Card Expansion Fix ── */
+    .notes-workspace {
+      height: calc(100vh - 63px) !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .notes-sidebar {
+      height: 100% !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .sidebar-header,
+    .sidebar-search-box,
+    .sidebar-footer {
+      flex-shrink: 0 !important;
+    }
+
+    .topics-list {
+      flex: 1 1 0 !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      overscroll-behavior: contain !important;
+      scrollbar-width: thin !important;
+      scrollbar-color: #555b72 #141519 !important;
+    }
+
+    /* Never squish topic cards — preserve full height for all files so container overflows and scrolls */
+    .topic-item {
+      flex-shrink: 0 !important;
+    }
+
+    .topic-header,
+    .topic-files-dropdown,
+    .file-item-btn {
+      flex-shrink: 0 !important;
+    }
+
+    .topics-list::-webkit-scrollbar {
+      width: 7px !important;
+    }
+
+    .topics-list::-webkit-scrollbar-track {
+      background: #141519 !important;
+    }
+
+    .topics-list::-webkit-scrollbar-thumb {
+      background: #44495c !important;
+      border-radius: 4px !important;
+    }
+
+    .topics-list::-webkit-scrollbar-thumb:hover {
+      background: #636b85 !important;
     }
   </style>
 </head>
@@ -706,6 +768,14 @@
         window.location.href = "{% url 'editor' %}";
       });
     }
+
+    // ── Auto-scroll Active Topic into View ───────────────────────────────
+    window.addEventListener("DOMContentLoaded", () => {
+      const activeTopic = document.querySelector(".topic-item.active-topic");
+      if (activeTopic) {
+        activeTopic.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    });
   </script>
 </body>
 </html>

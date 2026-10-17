@@ -153,6 +153,7 @@ body {
   display: flex;
   overflow: hidden;
   height: calc(100vh - 63px);
+  min-height: 0;
 }
 
 /* ── Left Sidebar (Topics & Dropdowns) ───────────────────────────────────── */
@@ -164,6 +165,8 @@ body {
   border-right: 1px solid #2a2c35;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -173,6 +176,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .sidebar-title-group {
@@ -203,6 +207,7 @@ body {
   padding: 12px 18px;
   border-bottom: 1px solid #262831;
   position: relative;
+  flex-shrink: 0;
 }
 
 .search-input {
@@ -236,14 +241,19 @@ body {
   pointer-events: none;
 }
 
-/* Topics list container */
+/* Topics list container - scrollable */
 .topics-list {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 12px 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #383c4a #141519;
 }
 
 /* Topic Item & Accordion Card */
@@ -253,6 +263,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.15s ease, background-color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .topic-item:hover {
@@ -271,6 +282,7 @@ body {
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .topic-header-left {
@@ -354,6 +366,7 @@ body {
   padding: 6px 8px;
   flex-direction: column;
   gap: 4px;
+  flex-shrink: 0;
 }
 
 .topic-item.expanded .topic-files-dropdown {
@@ -375,6 +388,7 @@ body {
   cursor: pointer;
   transition: all 0.15s ease;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .file-item-btn:hover {
@@ -418,6 +432,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-new-topic {
@@ -685,7 +700,7 @@ body {
 /* ── Custom Scrollbars ───────────────────────────────────────────────────── */
 .topics-list::-webkit-scrollbar,
 .canvas-body::-webkit-scrollbar {
-  width: 7px;
+  width: 6px;
 }
 
 .topics-list::-webkit-scrollbar-track,
@@ -695,13 +710,13 @@ body {
 
 .topics-list::-webkit-scrollbar-thumb,
 .canvas-body::-webkit-scrollbar-thumb {
-  background: #2a2c35;
+  background: #363946;
   border-radius: 4px;
 }
 
 .topics-list::-webkit-scrollbar-thumb:hover,
 .canvas-body::-webkit-scrollbar-thumb:hover {
-  background: #3b3e4c;
+  background: #4f5366;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
